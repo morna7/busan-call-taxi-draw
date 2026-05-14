@@ -9,7 +9,16 @@ import {
   useRef,
   useState
 } from "react";
-import { AlertCircle, Banknote, CheckCircle2, Clock3, MapPin, Trophy, Users } from "lucide-react";
+import {
+  AlertCircle,
+  Banknote,
+  Camera,
+  CheckCircle2,
+  Clock3,
+  MapPin,
+  Trophy,
+  Users
+} from "lucide-react";
 import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
 import { formatCountdown, formatDateTimeKo, formatPlainText } from "@/lib/time";
 import type { PublicDrawState } from "@/lib/types";
@@ -65,6 +74,54 @@ function useRemainingSeconds(endAt?: string, serverNow?: string) {
   return remaining;
 }
 
+function drawWrappedText(
+  context: CanvasRenderingContext2D,
+  text: string,
+  x: number,
+  y: number,
+  maxWidth: number,
+  lineHeight: number,
+  maxLines = 3
+) {
+  const words = text.replace(/\s+/g, " ").trim().split(" ");
+  const lines: string[] = [];
+  let line = "";
+
+  for (const word of words) {
+    const testLine = line ? `${line} ${word}` : word;
+    if (context.measureText(testLine).width > maxWidth && line) {
+      lines.push(line);
+      line = word;
+      if (lines.length >= maxLines) {
+        break;
+      }
+    } else {
+      line = testLine;
+    }
+  }
+
+  if (line && lines.length < maxLines) {
+    lines.push(line);
+  }
+
+  lines.forEach((lineText, index) => {
+    context.fillText(lineText, x, y + index * lineHeight);
+  });
+}
+
+async function copyResultCanvasToClipboard(canvas: HTMLCanvasElement) {
+  const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/png"));
+  if (!blob) {
+    throw new Error("결과 이미지를 만들지 못했습니다.");
+  }
+
+  if (!("ClipboardItem" in window) || !navigator.clipboard?.write) {
+    throw new Error("이 브라우저에서는 이미지 복사를 지원하지 않습니다.");
+  }
+
+  await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+}
+
 function LotteryMachine({ state }: { state: PublicDrawState }) {
   const participants = state.publicParticipants ?? [];
   const visibleParticipants = participants.slice(-12);
@@ -87,38 +144,45 @@ function LotteryMachine({ state }: { state: PublicDrawState }) {
       </div>
 
       <div className="lottery-stage mt-4">
-        <div className={`lottery-drum ${completed ? "is-finished" : "is-spinning"}`}>
-          {visibleParticipants.length > 0 ? (
-            visibleParticipants.map((participant, index) => {
-              const angle = `${(360 / visibleParticipants.length) * index}deg`;
-              return (
-                <div
-                  key={participant.id}
-                  className={`lottery-ball ${participant.isWinner ? "is-winner" : ""}`}
-                  style={
-                    {
-                      "--ball-angle": angle,
-                      "--ball-delay": `${index * -0.32}s`
-                    } as CSSProperties
-                  }
-                >
-                  <span>{participant.name}</span>
-                </div>
-              );
-            })
-          ) : (
-            <div className="flex h-full items-center justify-center px-8 text-center text-sm font-bold leading-6 text-slate-500">
-              아직 참여자가 없습니다.
-            </div>
-          )}
-        </div>
-
         {completed && winnerName ? (
-          <div className="winner-chute" aria-live="polite">
-            <div className="winner-ball">
+          <div className="winner-showcase" aria-live="polite">
+            <div className="winner-rays" />
+            <div className="winner-ball is-featured">
               <span>{winnerName}</span>
             </div>
-            <p className="text-sm font-black text-amber-700">당첨 공</p>
+            <p className="winner-label">당첨 공</p>
+          </div>
+        ) : (
+          <div className="lottery-drum is-spinning">
+            {visibleParticipants.length > 0 ? (
+              visibleParticipants.map((participant, index) => {
+                const angle = `${(360 / visibleParticipants.length) * index}deg`;
+                return (
+                  <div
+                    key={participant.id}
+                    className="lottery-ball"
+                    style={
+                      {
+                        "--ball-angle": angle,
+                        "--ball-delay": `${index * -0.32}s`
+                      } as CSSProperties
+                    }
+                  >
+                    <span>{participant.name}</span>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="flex h-full items-center justify-center px-8 text-center text-sm font-bold leading-6 text-slate-500">
+                아직 참여자가 없습니다.
+              </div>
+            )}
+          </div>
+        )}
+
+        {completed && !winnerName ? (
+          <div className="flex h-full min-h-64 items-center justify-center px-8 text-center text-sm font-bold leading-6 text-slate-500">
+            참여자 없음으로 마감되었습니다.
           </div>
         ) : null}
       </div>
@@ -126,6 +190,156 @@ function LotteryMachine({ state }: { state: PublicDrawState }) {
   );
 }
 
+function ResultCopyButton({ state }: { state: PublicDrawState }) {
+  const [copying, setCopying] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+
+  async function onCopyResultImage() {
+    setCopying(true);
+    setMessage(null);
+
+    try {
+      const canvas = document.createElement("canvas");
+      canvas.width = 1080;
+      canvas.height = 1320;
+      const context = canvas.getContext("2d");
+
+      if (!context) {
+        throw new Error("결과 이미지를 만들지 못했습니다.");
+      }
+
+      context.fillStyle = "#f8fafc";
+      context.fillRect(0, 0, canvas.width, canvas.height);
+
+      context.fillStyle = "#1d4ed8";
+      context.fillRect(0, 0, canvas.width, 230);
+
+      context.fillStyle = "#ffffff";
+      context.font = "800 34px Arial, Malgun Gothic, sans-serif";
+      context.fillText("장거리전문부산콜택시", 72, 82);
+      context.font = "900 58px Arial, Malgun Gothic, sans-serif";
+      context.fillText("배차 추첨 결과", 72, 160);
+
+      context.fillStyle = "#ffffff";
+      context.beginPath();
+      context.arc(902, 120, 72, 0, Math.PI * 2);
+      context.fill();
+      context.fillStyle = "#f59e0b";
+      context.beginPath();
+      context.arc(902, 120, 58, 0, Math.PI * 2);
+      context.fill();
+      context.fillStyle = "#78350f";
+      context.font = "900 26px Arial, Malgun Gothic, sans-serif";
+      context.textAlign = "center";
+      context.fillText("당첨", 902, 113);
+      context.fillText("공", 902, 145);
+      context.textAlign = "left";
+
+      context.fillStyle = "#ffffff";
+      context.strokeStyle = "#dbeafe";
+      context.lineWidth = 3;
+      context.beginPath();
+      context.roundRect(60, 280, 960, 920, 32);
+      context.fill();
+      context.stroke();
+
+      context.fillStyle = "#0f172a";
+      context.font = "900 48px Arial, Malgun Gothic, sans-serif";
+      drawWrappedText(context, state.draw.title, 108, 370, 840, 58, 2);
+
+      context.font = "700 34px Arial, Malgun Gothic, sans-serif";
+      context.fillStyle = "#334155";
+      context.fillText(`출발지: ${state.draw.origin}`, 108, 505);
+      context.fillText(`도착지: ${state.draw.destination}`, 108, 570);
+      context.fillText(`출발 예정: ${formatPlainText(state.draw.departureTime)}`, 108, 635);
+
+      if (state.draw.estimatedFare) {
+        context.fillText(`요금: ${state.draw.estimatedFare}`, 108, 700);
+      }
+
+      context.fillText(`참여자 수: ${state.participantCount}명`, 108, 765);
+
+      context.fillStyle = "#fef3c7";
+      context.beginPath();
+      context.roundRect(108, 825, 864, 150, 26);
+      context.fill();
+
+      context.fillStyle = "#92400e";
+      context.font = "900 34px Arial, Malgun Gothic, sans-serif";
+      context.fillText("당첨자", 150, 882);
+      context.font = "900 56px Arial, Malgun Gothic, sans-serif";
+      context.fillText(state.draw.winnerName ?? "참여자 없음", 150, 945);
+
+      context.fillStyle = "#475569";
+      context.font = "700 30px Arial, Malgun Gothic, sans-serif";
+      context.fillText(`추첨 완료 시간: ${formatDateTimeKo(state.draw.drawnAt)}`, 108, 1065);
+
+      if (state.draw.customerRequest) {
+        context.fillStyle = "#64748b";
+        context.font = "700 26px Arial, Malgun Gothic, sans-serif";
+        context.fillText("고객 요청사항", 108, 1135);
+        context.font = "600 25px Arial, Malgun Gothic, sans-serif";
+        drawWrappedText(context, state.draw.customerRequest, 108, 1180, 850, 36, 2);
+      }
+
+      await copyResultCanvasToClipboard(canvas);
+      setMessage("결과 이미지가 복사되었습니다. 카카오톡 등에 바로 붙여넣을 수 있습니다.");
+    } catch (caught) {
+      setMessage(caught instanceof Error ? caught.message : "결과 이미지 복사에 실패했습니다.");
+    } finally {
+      setCopying(false);
+    }
+  }
+
+  return (
+    <div className="mt-4">
+      <button
+        type="button"
+        onClick={onCopyResultImage}
+        disabled={copying}
+        className="flex min-h-12 w-full items-center justify-center gap-2 rounded-lg bg-slate-950 px-4 py-3 text-base font-black text-white shadow-sm transition hover:bg-slate-800 disabled:bg-slate-300"
+      >
+        <Camera size={19} aria-hidden />
+        {copying ? "이미지 복사 중" : "추첨 결과 이미지 복사"}
+      </button>
+      {message ? (
+        <p className="mt-2 rounded-lg bg-slate-50 px-3 py-2 text-sm font-bold leading-5 text-slate-600">
+          {message}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+function ResultSection({
+  state,
+  noParticipantsCompleted,
+  viewerWon
+}: {
+  state: PublicDrawState;
+  noParticipantsCompleted: boolean;
+  viewerWon: boolean | null;
+}) {
+  return (
+    <section className="mt-4 rounded-lg bg-white p-5 shadow-soft ring-1 ring-slate-200">
+      <Trophy className="text-amber-500" size={32} aria-hidden />
+      <h2 className="mt-3 text-xl font-black text-slate-950">추첨 결과</h2>
+      <p className="mt-3 text-base font-bold leading-7 text-slate-700">
+        {noParticipantsCompleted
+          ? "참여자 없음으로 마감되었습니다."
+          : viewerWon
+            ? "축하합니다. 배정되었습니다."
+            : "이번 의뢰는 다른 기사님께 배정되었습니다."}
+      </p>
+      {state.draw.winnerName ? (
+        <p className="mt-3 rounded-lg bg-amber-50 px-3 py-3 text-base font-black text-amber-800 ring-1 ring-amber-100">
+          당첨자: {state.draw.winnerName}
+        </p>
+      ) : null}
+      <ResultCopyButton state={state} />
+    </section>
+  );
+}
 export function JoinDrawClient({ publicCode }: { publicCode: string }) {
   const [state, setState] = useState<PublicDrawState | null>(null);
   const [nickname, setNickname] = useState("");
@@ -334,6 +548,13 @@ export function JoinDrawClient({ publicCode }: { publicCode: string }) {
     : state.draw.status === "open"
       ? formatCountdown(remaining)
       : "0:00";
+  const joinButtonLabel = submitting
+    ? "접수 중"
+    : canJoin
+      ? "추첨 참여하기"
+      : isScheduled
+        ? "참여 시작시간에 참여가능합니다."
+        : "참여할 수 없습니다";
 
   return (
     <main className="min-h-dvh bg-slate-50 pb-28">
@@ -410,22 +631,11 @@ export function JoinDrawClient({ publicCode }: { publicCode: string }) {
         ) : null}
 
         {completed ? (
-          <section className="mt-4 rounded-lg bg-white p-5 shadow-soft ring-1 ring-slate-200">
-            <Trophy className="text-amber-500" size={32} aria-hidden />
-            <h2 className="mt-3 text-xl font-black text-slate-950">추첨 결과</h2>
-            <p className="mt-3 text-base font-bold leading-7 text-slate-700">
-              {noParticipantsCompleted
-                ? "참여자 없음으로 마감되었습니다."
-                : viewerWon
-                  ? "축하합니다. 배정되었습니다."
-                  : "이번 의뢰는 다른 기사님께 배정되었습니다."}
-            </p>
-            {state.draw.winnerName ? (
-              <p className="mt-3 rounded-lg bg-amber-50 px-3 py-3 text-base font-black text-amber-800 ring-1 ring-amber-100">
-                당첨자: {state.draw.winnerName}
-              </p>
-            ) : null}
-          </section>
+          <ResultSection
+            state={state}
+            noParticipantsCompleted={noParticipantsCompleted}
+            viewerWon={viewerWon}
+          />
         ) : null}
 
         {state.draw.status === "cancelled" ? (
@@ -467,6 +677,14 @@ export function JoinDrawClient({ publicCode }: { publicCode: string }) {
                 같은 닉네임 구분을 위해 가능하면 입력해 주세요.
               </span>
             </label>
+            {state.draw.customerRequest ? (
+              <section className="mt-4 rounded-lg bg-blue-50 px-4 py-3 ring-1 ring-blue-100">
+                <h3 className="text-sm font-black text-brand-700">고객 요청사항</h3>
+                <p className="mt-2 whitespace-pre-wrap text-sm font-semibold leading-6 text-slate-700">
+                  {state.draw.customerRequest}
+                </p>
+              </section>
+            ) : null}
             {error ? <p className="mt-3 text-sm font-bold text-rose-700">{error}</p> : null}
             {notice ? <p className="mt-3 text-sm font-bold text-emerald-700">{notice}</p> : null}
           </form>
@@ -488,7 +706,7 @@ export function JoinDrawClient({ publicCode }: { publicCode: string }) {
               disabled={!canJoin || submitting}
               className="flex min-h-14 w-full items-center justify-center rounded-lg bg-brand-600 px-4 py-3 text-lg font-black text-white shadow-lg transition hover:bg-brand-700 disabled:bg-slate-300"
             >
-              {submitting ? "접수 중" : canJoin ? "추첨 참여하기" : "참여할 수 없습니다"}
+              {joinButtonLabel}
             </button>
           </div>
         </div>

@@ -55,6 +55,7 @@ export type PublicDrawState = {
     destination: string;
     departureTime: string | null;
     estimatedFare: string | null;
+    customerRequest: string | null;
     status: DrawStatus;
     startAt: string;
     endAt: string;

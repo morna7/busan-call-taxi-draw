@@ -122,6 +122,7 @@ export function toPublicDrawState(args: {
       destination: draw.destination,
       departureTime: draw.departure_time,
       estimatedFare: draw.estimated_fare,
+      customerRequest: draw.customer_request,
       status: draw.status,
       startAt: draw.start_at,
       endAt: draw.end_at,
