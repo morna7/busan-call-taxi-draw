@@ -117,6 +117,22 @@ Vercel 배포 기준:
 
 Supabase Realtime을 사용하려면 마이그레이션의 publication 설정이 적용되어야 합니다. Supabase 대시보드의 `Database > Replication`에서 `draws`, `participants`가 Realtime 대상인지 확인할 수 있습니다.
 
+## Vercel 로그인 문제 확인
+
+Vercel에서만 로그인이 실패하면 먼저 `/admin/login` 화면의 `배포 환경변수 확인` 영역을 확인합니다. 이 영역은 실제 키 값은 노출하지 않고 다음 값이 브라우저와 서버에서 로드됐는지만 보여줍니다.
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+
+같은 정보는 아래 주소에서도 JSON으로 확인할 수 있습니다.
+
+```text
+https://your-vercel-domain.vercel.app/api/diagnostics/env
+```
+
+로그인 실패 시에는 Supabase가 반환한 실제 `error.message`가 화면에 표시됩니다. 예를 들어 `Invalid login credentials`, `Email not confirmed`, `Failed to fetch` 같은 메시지를 보고 원인을 좁힐 수 있습니다.
+
 ## 결과 복사 형식
 
 완료된 추첨의 관리자 상세 화면에서 다음 형식으로 복사됩니다.
