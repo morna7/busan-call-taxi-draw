@@ -327,6 +327,13 @@ export function JoinDrawClient({ publicCode }: { publicCode: string }) {
   const completed = state.draw.status === "completed";
   const noParticipantsCompleted = completed && !state.draw.winnerName;
   const viewerWon = completed && viewer && viewer.id === state.draw.winnerParticipantId;
+  const isScheduled = state.draw.status === "scheduled";
+  const timePanelLabel = isScheduled ? "참여 시작 시간" : "남은 시간";
+  const timePanelValue = isScheduled
+    ? formatDateTimeKo(state.draw.startAt)
+    : state.draw.status === "open"
+      ? formatCountdown(remaining)
+      : "0:00";
 
   return (
     <main className="min-h-dvh bg-slate-50 pb-28">
@@ -367,11 +374,13 @@ export function JoinDrawClient({ publicCode }: { publicCode: string }) {
           </div>
 
           <div className="mt-5 rounded-lg bg-brand-50 p-4 text-center ring-1 ring-blue-100">
-            <p className="text-sm font-bold text-brand-700">남은 시간</p>
-            <p className="mt-1 text-5xl font-black tracking-normal text-brand-700">
-              {state.draw.status === "open" || state.draw.status === "scheduled"
-                ? formatCountdown(remaining)
-                : "0:00"}
+            <p className="text-sm font-bold text-brand-700">{timePanelLabel}</p>
+            <p
+              className={`mt-1 font-black tracking-normal text-brand-700 ${
+                isScheduled ? "text-2xl leading-tight" : "text-5xl"
+              }`}
+            >
+              {timePanelValue}
             </p>
           </div>
         </section>
