@@ -15,7 +15,7 @@ type DashboardData = {
   draws: AdminDrawSummary[];
 };
 
-const STATUS_ORDER: DrawStatus[] = ["open", "scheduled", "drawing", "completed", "cancelled"];
+const STATUS_ORDER: DrawStatus[] = ["open", "scheduled", "completed", "cancelled"];
 
 function remainingText(draw: AdminDrawSummary, serverOffset: number, clientNow: number) {
   if (draw.status === "completed" || draw.status === "cancelled") {
