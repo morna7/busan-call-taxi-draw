@@ -16,6 +16,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
+  let pendingCookies: CookieToSet[] = [];
   const response = NextResponse.next({ request });
   const supabase = createServerClient(url, anonKey, {
     cookies: {
@@ -23,6 +24,7 @@ export async function proxy(request: NextRequest) {
         return request.cookies.getAll();
       },
       setAll(cookiesToSet: CookieToSet[]) {
+        pendingCookies = cookiesToSet;
         cookiesToSet.forEach(({ name, value, options }) => {
           request.cookies.set(name, value);
           response.cookies.set(name, value, options);
@@ -37,6 +39,12 @@ export async function proxy(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
   const redirect = getAdminRedirect(pathname, Boolean(user));
+  const applyPendingCookies = (targetResponse: NextResponse) => {
+    pendingCookies.forEach(({ name, value, options }) => {
+      targetResponse.cookies.set(name, value, options);
+    });
+    return targetResponse;
+  };
 
   if (redirect?.pathname === "/admin/login") {
     const redirectUrl = request.nextUrl.clone();
@@ -44,17 +52,17 @@ export async function proxy(request: NextRequest) {
     if (redirect.next) {
       redirectUrl.searchParams.set("next", redirect.next);
     }
-    return NextResponse.redirect(redirectUrl);
+    return applyPendingCookies(NextResponse.redirect(redirectUrl));
   }
 
   if (redirect?.pathname === "/admin") {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = "/admin";
     redirectUrl.search = "";
-    return NextResponse.redirect(redirectUrl);
+    return applyPendingCookies(NextResponse.redirect(redirectUrl));
   }
 
-  return response;
+  return applyPendingCookies(response);
 }
 
 export const config = {

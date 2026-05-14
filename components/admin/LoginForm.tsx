@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { LogIn } from "lucide-react";
 import { getClientEnvDiagnostics } from "@/lib/env-diagnostics";
 import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
@@ -27,6 +27,21 @@ type EnvDiagnostics = {
 type ServerEnvDiagnosticsResponse = {
   ok: boolean;
   data?: EnvDiagnostics;
+  message?: string;
+};
+
+type AuthDiagnostics = {
+  serverSeesUser: boolean;
+  userEmail: string | null;
+  userId: string | null;
+  authCookieCount: number;
+  authCookieNames: string[];
+  errorMessage: string | null;
+};
+
+type AuthDiagnosticsResponse = {
+  ok: boolean;
+  data?: AuthDiagnostics;
   message?: string;
 };
 
@@ -117,7 +132,6 @@ function EnvDiagnosticsPanel({
 }
 
 export function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const [clientEnv] = useState<EnvDiagnostics>(() => getClientEnvDiagnostics());
   const [serverEnv, setServerEnv] = useState<EnvDiagnostics | null>(null);
@@ -125,6 +139,7 @@ export function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [debugMessage, setDebugMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -156,11 +171,12 @@ export function LoginForm() {
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
+    setDebugMessage(null);
     setLoading(true);
 
     try {
       const supabase = createBrowserSupabaseClient();
-      const { error: signInError } = await supabase.auth.signInWithPassword({
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password
       });
@@ -170,9 +186,58 @@ export function LoginForm() {
         return;
       }
 
+      const {
+        data: { session },
+        error: sessionError
+      } = await supabase.auth.getSession();
+
+      if (sessionError) {
+        setError(`Supabase 세션 확인 오류: ${sessionError.message}`);
+        return;
+      }
+
+      const browserCookieNames = document.cookie
+        .split(";")
+        .map((cookie) => cookie.trim().split("=")[0])
+        .filter((name) => name.startsWith("sb-"));
+
+      const authResponse = await fetch("/api/diagnostics/auth", {
+        cache: "no-store",
+        credentials: "include"
+      });
+      const authPayload = (await authResponse.json()) as AuthDiagnosticsResponse;
+
+      if (!authResponse.ok || !authPayload.ok || !authPayload.data) {
+        setError(authPayload.message || "로그인 후 서버 세션 확인에 실패했습니다.");
+        return;
+      }
+
+      const debugLines = [
+        `로그인 성공: ${signInData.user?.email ?? email}`,
+        `브라우저 세션 저장: ${session ? "성공" : "실패"}`,
+        `브라우저 Supabase 쿠키 수: ${browserCookieNames.length}`,
+        `서버 Supabase 쿠키 수: ${authPayload.data.authCookieCount}`,
+        `서버 사용자 인식: ${authPayload.data.serverSeesUser ? "성공" : "실패"}`,
+        authPayload.data.errorMessage ? `서버 인증 오류: ${authPayload.data.errorMessage}` : null
+      ].filter(Boolean);
+      setDebugMessage(debugLines.join(" / "));
+
+      if (!session) {
+        setError("로그인은 성공했지만 브라우저에 Supabase session이 저장되지 않았습니다.");
+        return;
+      }
+
+      if (!authPayload.data.serverSeesUser) {
+        setError(
+          authPayload.data.errorMessage
+            ? `로그인은 성공했지만 서버가 session cookie를 읽지 못합니다: ${authPayload.data.errorMessage}`
+            : "로그인은 성공했지만 서버가 session cookie를 읽지 못합니다."
+        );
+        return;
+      }
+
       const next = searchParams.get("next") || "/admin";
-      router.replace(next);
-      router.refresh();
+      window.location.assign(next);
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "로그인 중 오류가 발생했습니다.");
     } finally {
@@ -206,6 +271,11 @@ export function LoginForm() {
       {error ? (
         <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-700">
           {error}
+        </p>
+      ) : null}
+      {debugMessage ? (
+        <p className="rounded-lg bg-blue-50 px-3 py-2 text-xs font-semibold leading-5 text-blue-800">
+          {debugMessage}
         </p>
       ) : null}
       <EnvDiagnosticsPanel
