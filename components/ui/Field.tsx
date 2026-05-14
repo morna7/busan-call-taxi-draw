@@ -9,9 +9,9 @@ type FieldProps = {
 export function Field({ label, hint, children }: FieldProps) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-sm font-bold text-slate-800">{label}</span>
+      <span className="mb-2 block text-sm font-black text-slate-800">{label}</span>
       {children}
-      {hint ? <span className="mt-1 block text-xs leading-5 text-slate-500">{hint}</span> : null}
+      {hint ? <span className="mt-2 block text-xs font-semibold leading-5 text-slate-500">{hint}</span> : null}
     </label>
   );
 }
@@ -20,7 +20,7 @@ export function TextInput(props: InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       {...props}
-      className={`w-full rounded-lg border border-slate-200 bg-white px-3.5 py-3 text-base text-slate-900 shadow-sm transition placeholder:text-slate-400 focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-blue-100 ${props.className ?? ""}`}
+      className={`w-full rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3.5 text-base font-semibold text-slate-950 shadow-sm transition placeholder:text-slate-400 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-100 ${props.className ?? ""}`}
     />
   );
 }
@@ -29,7 +29,7 @@ export function TextArea(props: TextareaHTMLAttributes<HTMLTextAreaElement>) {
   return (
     <textarea
       {...props}
-      className={`min-h-24 w-full rounded-lg border border-slate-200 bg-white px-3.5 py-3 text-base text-slate-900 shadow-sm transition placeholder:text-slate-400 focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-blue-100 ${props.className ?? ""}`}
+      className={`min-h-28 w-full rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3.5 text-base font-semibold text-slate-950 shadow-sm transition placeholder:text-slate-400 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-100 ${props.className ?? ""}`}
     />
   );
 }

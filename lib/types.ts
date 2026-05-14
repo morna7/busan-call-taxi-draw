@@ -128,7 +128,7 @@ export const DRAW_STATUS_LABEL: Record<DrawStatus, string> = {
 
 export const DRAW_STATUS_TONE: Record<DrawStatus, string> = {
   scheduled: "bg-slate-100 text-slate-700 ring-slate-200",
-  open: "bg-blue-50 text-blue-700 ring-blue-200",
+  open: "bg-blue-50 text-brand-700 ring-blue-200",
   drawing: "bg-amber-50 text-amber-700 ring-amber-200",
   completed: "bg-emerald-50 text-emerald-700 ring-emerald-200",
   cancelled: "bg-rose-50 text-rose-700 ring-rose-200"

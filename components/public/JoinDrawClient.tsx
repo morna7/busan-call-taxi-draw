@@ -130,7 +130,7 @@ function LotteryMachine({ state }: { state: PublicDrawState }) {
   const winnerName = state.draw.winnerName ?? winnerParticipant?.name ?? null;
 
   return (
-    <section className="mt-4 rounded-lg bg-white p-5 shadow-soft ring-1 ring-slate-200">
+    <section className="mt-4 rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-200/80">
       <div className="flex items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-black text-slate-950">추첨 공</h2>
@@ -297,13 +297,13 @@ function ResultCopyButton({ state }: { state: PublicDrawState }) {
         type="button"
         onClick={onCopyResultImage}
         disabled={copying}
-        className="flex min-h-12 w-full items-center justify-center gap-2 rounded-lg bg-slate-950 px-4 py-3 text-base font-black text-white shadow-sm transition hover:bg-slate-800 disabled:bg-slate-300"
+        className="flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-slate-950 px-4 py-3 text-base font-black text-white shadow-sm transition hover:bg-slate-800 disabled:bg-slate-300"
       >
         <Camera size={19} aria-hidden />
         {copying ? "이미지 복사 중" : "추첨 결과 이미지 복사"}
       </button>
       {message ? (
-        <p className="mt-2 rounded-lg bg-slate-50 px-3 py-2 text-sm font-bold leading-5 text-slate-600">
+        <p className="mt-2 rounded-2xl bg-slate-50 px-3 py-2 text-sm font-bold leading-5 text-slate-600">
           {message}
         </p>
       ) : null}
@@ -321,7 +321,7 @@ function ResultSection({
   viewerWon: boolean | null;
 }) {
   return (
-    <section className="mt-4 rounded-lg bg-white p-5 shadow-soft ring-1 ring-slate-200">
+    <section className="mt-4 rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-200/80">
       <Trophy className="text-amber-500" size={32} aria-hidden />
       <h2 className="mt-3 text-xl font-black text-slate-950">추첨 결과</h2>
       <p className="mt-3 text-base font-bold leading-7 text-slate-700">
@@ -332,7 +332,7 @@ function ResultSection({
             : "이번 의뢰는 다른 기사님께 배정되었습니다."}
       </p>
       {state.draw.winnerName ? (
-        <p className="mt-3 rounded-lg bg-amber-50 px-3 py-3 text-base font-black text-amber-800 ring-1 ring-amber-100">
+        <p className="mt-3 rounded-2xl bg-amber-50 px-3 py-3 text-base font-black text-amber-800 ring-1 ring-amber-100">
           당첨자: {state.draw.winnerName}
         </p>
       ) : null}
@@ -515,7 +515,7 @@ export function JoinDrawClient({ publicCode }: { publicCode: string }) {
 
   if (loading) {
     return (
-      <main className="flex min-h-dvh items-center justify-center bg-slate-50 px-4">
+      <main className="flex min-h-dvh items-center justify-center px-4">
         <div className="text-center text-base font-bold text-slate-600">참여 화면을 불러오는 중입니다.</div>
       </main>
     );
@@ -523,8 +523,8 @@ export function JoinDrawClient({ publicCode }: { publicCode: string }) {
 
   if (error && !state) {
     return (
-      <main className="flex min-h-dvh items-center justify-center bg-slate-50 px-4">
-        <section className="w-full max-w-md rounded-lg bg-white p-5 text-center shadow-soft ring-1 ring-slate-200">
+      <main className="flex min-h-dvh items-center justify-center px-4">
+        <section className="w-full max-w-md rounded-3xl bg-white p-6 text-center shadow-card ring-1 ring-slate-200/80">
           <AlertCircle className="mx-auto text-rose-600" size={34} aria-hidden />
           <h1 className="mt-3 text-xl font-black text-slate-950">참여할 수 없습니다</h1>
           <p className="mt-2 text-sm leading-6 text-slate-600">{error}</p>
@@ -557,19 +557,21 @@ export function JoinDrawClient({ publicCode }: { publicCode: string }) {
         : "참여할 수 없습니다";
 
   return (
-    <main className="min-h-dvh bg-slate-50 pb-28">
+    <main className="min-h-dvh pb-28">
       <div className="mx-auto w-full max-w-md px-4 py-5">
+        <div className="rounded-3xl bg-gradient-to-br from-brand-900 via-brand-800 to-slate-950 p-5 text-white shadow-lift">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-sm font-black text-brand-600">장거리전문부산콜택시</p>
-            <h1 className="mt-1 text-2xl font-black leading-tight text-slate-950">
+            <p className="text-sm font-black text-blue-200">장거리전문부산콜택시</p>
+            <h1 className="mt-1 text-2xl font-black leading-tight text-white">
               배차 추첨 참여
             </h1>
           </div>
           <StatusBadge status={state.draw.status} />
         </div>
+        </div>
 
-        <section className="mt-5 rounded-lg bg-white p-5 shadow-soft ring-1 ring-slate-200">
+        <section className="mt-4 rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-200/80">
           <h2 className="text-xl font-black leading-snug text-slate-950">{state.draw.title}</h2>
           <div className="mt-4 space-y-3 text-base text-slate-700">
             <div className="flex gap-2">
@@ -594,7 +596,7 @@ export function JoinDrawClient({ publicCode }: { publicCode: string }) {
             </div>
           </div>
 
-          <div className="mt-5 rounded-lg bg-brand-50 p-4 text-center ring-1 ring-blue-100">
+          <div className="mt-5 rounded-3xl bg-gradient-to-br from-brand-50 to-blue-100 p-4 text-center ring-1 ring-blue-100">
             <p className="text-sm font-bold text-brand-700">{timePanelLabel}</p>
             <p
               className={`mt-1 font-black tracking-normal text-brand-700 ${
@@ -609,7 +611,7 @@ export function JoinDrawClient({ publicCode }: { publicCode: string }) {
         <LotteryMachine state={state} />
 
         {viewer ? (
-          <section className="mt-4 rounded-lg bg-white p-5 shadow-soft ring-1 ring-slate-200">
+          <section className="mt-4 rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-200/80">
             <CheckCircle2 className="text-emerald-600" size={30} aria-hidden />
             <h2 className="mt-3 text-xl font-black text-slate-950">참여가 완료되었습니다</h2>
             <dl className="mt-4 space-y-2 text-sm text-slate-700">
@@ -639,7 +641,7 @@ export function JoinDrawClient({ publicCode }: { publicCode: string }) {
         ) : null}
 
         {state.draw.status === "cancelled" ? (
-          <section className="mt-4 rounded-lg bg-white p-5 shadow-soft ring-1 ring-rose-100">
+          <section className="mt-4 rounded-3xl bg-white p-5 shadow-card ring-1 ring-rose-100">
             <h2 className="text-xl font-black text-rose-700">취소된 추첨입니다</h2>
             <p className="mt-2 text-sm leading-6 text-slate-600">
               관리자에 의해 의뢰가 취소되어 더 이상 참여할 수 없습니다.
@@ -648,13 +650,13 @@ export function JoinDrawClient({ publicCode }: { publicCode: string }) {
         ) : null}
 
         {!viewer && !completed && state.draw.status !== "cancelled" ? (
-          <form onSubmit={onSubmit} className="mt-4 rounded-lg bg-white p-5 shadow-soft ring-1 ring-slate-200">
+          <form onSubmit={onSubmit} className="mt-4 rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-200/80">
             <label className="block">
               <span className="mb-1.5 block text-sm font-black text-slate-800">닉네임</span>
               <input
                 value={nickname}
                 onChange={(event) => setNickname(event.target.value)}
-                className="w-full rounded-lg border border-slate-200 px-3.5 py-3 text-base font-semibold focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-blue-100"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3.5 text-base font-semibold focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-100"
                 placeholder="사용할 닉네임"
                 autoComplete="nickname"
                 disabled={!canJoin || submitting}
@@ -667,7 +669,7 @@ export function JoinDrawClient({ publicCode }: { publicCode: string }) {
               <input
                 value={vehicleLast4}
                 onChange={(event) => setVehicleLast4(event.target.value.replace(/\D/g, "").slice(0, 4))}
-                className="w-full rounded-lg border border-slate-200 px-3.5 py-3 text-base font-semibold focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-blue-100"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3.5 text-base font-semibold focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-100"
                 placeholder="예: 1234"
                 inputMode="numeric"
                 maxLength={4}
@@ -678,7 +680,7 @@ export function JoinDrawClient({ publicCode }: { publicCode: string }) {
               </span>
             </label>
             {state.draw.customerRequest ? (
-              <section className="mt-4 rounded-lg bg-blue-50 px-4 py-3 ring-1 ring-blue-100">
+              <section className="mt-4 rounded-2xl bg-blue-50 px-4 py-3 ring-1 ring-blue-100">
                 <h3 className="text-sm font-black text-brand-700">고객 요청사항</h3>
                 <p className="mt-2 whitespace-pre-wrap text-sm font-semibold leading-6 text-slate-700">
                   {state.draw.customerRequest}
@@ -704,7 +706,7 @@ export function JoinDrawClient({ publicCode }: { publicCode: string }) {
                 }
               }}
               disabled={!canJoin || submitting}
-              className="flex min-h-14 w-full items-center justify-center rounded-lg bg-brand-600 px-4 py-3 text-lg font-black text-white shadow-lg transition hover:bg-brand-700 disabled:bg-slate-300"
+              className="flex min-h-14 w-full items-center justify-center rounded-2xl bg-gradient-to-b from-brand-600 to-brand-700 px-4 py-3 text-lg font-black text-white shadow-lift transition hover:from-brand-500 hover:to-brand-700 disabled:from-slate-300 disabled:to-slate-300 disabled:shadow-none"
             >
               {joinButtonLabel}
             </button>

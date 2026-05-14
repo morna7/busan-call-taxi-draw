@@ -257,7 +257,7 @@ export function DrawDetailClient({ initialData }: { initialData: DetailData }) {
   }
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 py-5">
+    <main className="mx-auto w-full max-w-5xl px-4 py-5 sm:py-7">
       <Link
         href="/admin"
         className="inline-flex items-center gap-1 text-sm font-bold text-slate-600 hover:text-slate-950"
@@ -266,7 +266,8 @@ export function DrawDetailClient({ initialData }: { initialData: DetailData }) {
         대시보드
       </Link>
 
-      <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+      <div className="mt-4 rounded-3xl bg-gradient-to-br from-white via-blue-50 to-slate-100 p-5 shadow-card ring-1 ring-slate-200/80">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <StatusBadge status={draw.status} />
@@ -298,6 +299,7 @@ export function DrawDetailClient({ initialData }: { initialData: DetailData }) {
           ) : null}
         </div>
       </div>
+      </div>
 
       {message ? (
         <p className="mt-4 rounded-lg bg-emerald-50 px-3 py-2 text-sm font-bold text-emerald-700 ring-1 ring-emerald-100">
@@ -311,32 +313,32 @@ export function DrawDetailClient({ initialData }: { initialData: DetailData }) {
       ) : null}
 
       <div className="mt-5 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-        <section className="rounded-lg bg-white p-5 shadow-soft ring-1 ring-slate-200">
+        <section className="rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-200/80">
           <h2 className="text-lg font-black text-slate-950">의뢰 정보</h2>
           <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
-            <div className="rounded-lg bg-slate-50 p-3">
+            <div className="rounded-2xl bg-slate-50 p-3 ring-1 ring-slate-100">
               <dt className="font-bold text-slate-500">출발 예정 시간</dt>
               <dd className="mt-1 font-black text-slate-950">{formatPlainText(draw.departureTime)}</dd>
             </div>
-            <div className="rounded-lg bg-blue-50 p-3">
+            <div className="rounded-2xl bg-blue-50 p-3 ring-1 ring-blue-100">
               <dt className="font-bold text-blue-700">남은 시간</dt>
               <dd className="mt-1 text-2xl font-black text-blue-700">
                 {remainingText(draw, serverOffset, clientNow)}
               </dd>
             </div>
-            <div className="rounded-lg bg-slate-50 p-3">
+            <div className="rounded-2xl bg-slate-50 p-3 ring-1 ring-slate-100">
               <dt className="font-bold text-slate-500">참여 시작</dt>
               <dd className="mt-1 font-black text-slate-950">{formatDateTimeKo(draw.startAt)}</dd>
             </div>
-            <div className="rounded-lg bg-slate-50 p-3">
+            <div className="rounded-2xl bg-slate-50 p-3 ring-1 ring-slate-100">
               <dt className="font-bold text-slate-500">참여 마감</dt>
               <dd className="mt-1 font-black text-slate-950">{formatDateTimeKo(draw.endAt)}</dd>
             </div>
-            <div className="rounded-lg bg-slate-50 p-3">
+            <div className="rounded-2xl bg-slate-50 p-3 ring-1 ring-slate-100">
               <dt className="font-bold text-slate-500">요금</dt>
               <dd className="mt-1 font-black text-slate-950">{draw.estimatedFare ?? "-"}</dd>
             </div>
-            <div className="rounded-lg bg-slate-50 p-3">
+            <div className="rounded-2xl bg-slate-50 p-3 ring-1 ring-slate-100">
               <dt className="font-bold text-slate-500">추첨 완료 시간</dt>
               <dd className="mt-1 font-black text-slate-950">{formatDateTimeKo(draw.drawnAt)}</dd>
             </div>
@@ -358,7 +360,7 @@ export function DrawDetailClient({ initialData }: { initialData: DetailData }) {
         </section>
 
         <aside className="space-y-4">
-          <section className="rounded-lg bg-white p-5 text-center shadow-soft ring-1 ring-slate-200">
+          <section className="rounded-3xl bg-white p-5 text-center shadow-card ring-1 ring-slate-200/80">
             <h2 className="text-lg font-black text-slate-950">참여 QR</h2>
             <div className="mt-4 flex justify-center">
               {siteOrigin ? (
@@ -388,7 +390,7 @@ export function DrawDetailClient({ initialData }: { initialData: DetailData }) {
             </div>
           </section>
 
-          <section className="rounded-lg bg-white p-5 shadow-soft ring-1 ring-slate-200">
+          <section className="rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-200/80">
             <h2 className="flex items-center gap-2 text-lg font-black text-slate-950">
               <Trophy size={21} className="text-amber-500" aria-hidden />
               결과
@@ -429,7 +431,7 @@ export function DrawDetailClient({ initialData }: { initialData: DetailData }) {
       </div>
 
       {editOpen ? (
-        <form onSubmit={saveEdit} className="mt-4 rounded-lg bg-white p-5 shadow-soft ring-1 ring-slate-200">
+        <form onSubmit={saveEdit} className="mt-4 rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-200/80">
           <h2 className="text-lg font-black text-slate-950">시작 전 의뢰 수정</h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <Field label="의뢰 제목">
@@ -473,7 +475,7 @@ export function DrawDetailClient({ initialData }: { initialData: DetailData }) {
         </form>
       ) : null}
 
-      <section className="mt-4 rounded-lg bg-white p-5 shadow-soft ring-1 ring-slate-200">
+      <section className="mt-4 rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-200/80">
         <div className="flex items-center justify-between gap-3">
           <h2 className="flex items-center gap-2 text-lg font-black text-slate-950">
             <Users size={21} className="text-brand-600" aria-hidden />
@@ -481,18 +483,18 @@ export function DrawDetailClient({ initialData }: { initialData: DetailData }) {
           </h2>
           <span className="text-sm font-black text-slate-500">{draw.participantCount}명</span>
         </div>
-        <div className="mt-4 overflow-hidden rounded-lg ring-1 ring-slate-200">
+        <div className="mt-4">
           {draw.participants.length === 0 ? (
             <p className="bg-slate-50 px-4 py-6 text-center text-sm font-semibold text-slate-500">
               아직 참여자가 없습니다.
             </p>
           ) : (
-            <div className="divide-y divide-slate-100">
+            <div className="grid gap-3 sm:grid-cols-2">
               {draw.participants.map((participant, index) => (
                 <div
                   key={participant.id}
-                  className={`grid grid-cols-[2rem_1fr] gap-3 p-3 sm:grid-cols-[2rem_1fr_8rem_8rem] ${
-                    participant.isWinner ? "bg-amber-50" : "bg-white"
+                  className={`rounded-2xl p-3 shadow-sm ring-1 grid grid-cols-[2rem_1fr] gap-3 ${
+                    participant.isWinner ? "bg-amber-50 ring-amber-200" : "bg-white ring-slate-200"
                   }`}
                 >
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-sm font-black text-slate-600">
@@ -507,14 +509,14 @@ export function DrawDetailClient({ initialData }: { initialData: DetailData }) {
                         </span>
                       ) : null}
                     </p>
-                    <p className="mt-1 text-xs font-semibold text-slate-500 sm:hidden">
+                    <p className="hidden">
                       {formatDateTimeKo(participant.joinedAt)} · 차량번호 뒤 4자리 {participant.phoneLast4 ?? "-"}
                     </p>
                   </div>
-                  <p className="hidden text-sm font-semibold text-slate-600 sm:block">
+                  <p className="col-span-2 text-sm font-semibold text-slate-600">
                     {formatDateTimeKo(participant.joinedAt)}
                   </p>
-                  <p className="hidden text-sm font-black text-slate-700 sm:block">
+                  <p className="col-span-2 text-sm font-black text-slate-700">
                     차량번호 {participant.phoneLast4 ?? "-"}
                   </p>
                 </div>
@@ -524,7 +526,7 @@ export function DrawDetailClient({ initialData }: { initialData: DetailData }) {
         </div>
       </section>
 
-      <section className="mt-4 rounded-lg bg-white p-5 shadow-soft ring-1 ring-slate-200">
+      <section className="mt-4 rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-200/80">
         <h2 className="text-lg font-black text-slate-950">최근 추첨 로그</h2>
         <div className="mt-3 space-y-2">
           {draw.auditLogs.length === 0 ? (

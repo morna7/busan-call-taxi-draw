@@ -4,7 +4,7 @@
 
 :root {
   color-scheme: light;
-  --background: #f7fafc;
+  --background: #f4f7fb;
   --foreground: #111827;
 }
 
@@ -18,7 +18,9 @@ html {
 
 body {
   margin: 0;
-  background: var(--background);
+  background:
+    radial-gradient(circle at 50% -10%, rgba(31, 122, 224, 0.12), transparent 34rem),
+    linear-gradient(180deg, #f8fbff 0%, var(--background) 32%, #f6f8fb 100%);
   color: var(--foreground);
   font-family:
     Arial,
@@ -32,6 +34,10 @@ input,
 textarea,
 select {
   font: inherit;
+}
+
+::selection {
+  background: rgba(31, 122, 224, 0.18);
 }
 
 button:focus-visible,

@@ -3,8 +3,8 @@ import { LoginForm } from "@/components/admin/LoginForm";
 
 export default function AdminLoginPage() {
   return (
-    <main className="flex min-h-dvh items-center justify-center bg-slate-50 px-4 py-8">
-      <section className="w-full max-w-md rounded-lg bg-white p-6 shadow-soft ring-1 ring-slate-200">
+    <main className="flex min-h-dvh items-center justify-center px-4 py-8">
+      <section className="w-full max-w-md rounded-3xl bg-white p-6 shadow-card ring-1 ring-slate-200/80">
         <p className="text-sm font-bold text-brand-600">관리자 로그인</p>
         <h1 className="mt-2 text-2xl font-black leading-tight text-slate-950">
           장거리전문부산콜택시 배차 추첨

@@ -95,9 +95,9 @@ export function DrawForm() {
 
   return (
     <form onSubmit={onSubmit} className="space-y-5">
-      <section className="rounded-lg bg-white p-5 shadow-soft ring-1 ring-slate-200">
+      <section className="rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-200/80 sm:p-6">
         <div className="flex items-start gap-3">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-700">
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-50 to-blue-100 text-brand-700 ring-1 ring-blue-100">
             <CalendarClock size={21} aria-hidden />
           </span>
           <div>
@@ -167,13 +167,13 @@ export function DrawForm() {
         </div>
       </section>
 
-      <section className="rounded-lg bg-white p-5 shadow-soft ring-1 ring-slate-200">
+      <section className="rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-200/80 sm:p-6">
         <h2 className="text-lg font-black text-slate-950">참여 시간</h2>
-        <div className="mt-4 grid grid-cols-2 gap-2 rounded-lg bg-slate-100 p-1">
+        <div className="mt-4 grid grid-cols-2 gap-2 rounded-2xl bg-slate-100 p-1.5 ring-1 ring-slate-200/80">
           <button
             type="button"
             onClick={() => update("startMode", "now")}
-            className={`rounded-md px-3 py-3 text-sm font-black transition ${
+            className={`rounded-xl px-3 py-3.5 text-sm font-black transition ${
               form.startMode === "now" ? "bg-white text-brand-700 shadow-sm" : "text-slate-600"
             }`}
           >
@@ -188,7 +188,7 @@ export function DrawForm() {
                 startAt: getCurrentDateTimeLocalValue()
               }));
             }}
-            className={`rounded-md px-3 py-3 text-sm font-black transition ${
+            className={`rounded-xl px-3 py-3.5 text-sm font-black transition ${
               form.startMode === "scheduled" ? "bg-white text-brand-700 shadow-sm" : "text-slate-600"
             }`}
           >
@@ -224,7 +224,7 @@ export function DrawForm() {
       </section>
 
       {error ? (
-        <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm font-bold text-rose-700 ring-1 ring-rose-100">
+        <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm font-bold text-rose-700 ring-1 ring-rose-100">
           {error}
         </p>
       ) : null}

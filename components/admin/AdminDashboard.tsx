@@ -143,8 +143,8 @@ export function AdminDashboard({ initialData }: { initialData: DashboardData }) 
   }
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 py-5">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+    <main className="mx-auto w-full max-w-5xl px-4 py-5 sm:py-7">
+      <div className="flex flex-col gap-4 rounded-3xl bg-gradient-to-br from-white via-blue-50 to-slate-100 p-5 shadow-card ring-1 ring-slate-200/80 sm:flex-row sm:items-end sm:justify-between sm:p-6">
         <div>
           <p className="text-sm font-black text-brand-600">관리자 대시보드</p>
           <h1 className="mt-1 text-2xl font-black text-slate-950">의뢰와 추첨 현황</h1>
@@ -157,7 +157,7 @@ export function AdminDashboard({ initialData }: { initialData: DashboardData }) 
           </PrimaryButton>
           <Link
             href="/admin/draws/new"
-            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-brand-600 px-4 py-3 text-base font-bold text-white shadow-sm transition hover:bg-brand-700"
+            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-brand-600 to-brand-700 px-4 py-3 text-base font-black text-white shadow-lift transition hover:from-brand-500 hover:to-brand-700"
           >
             <Plus size={18} aria-hidden />
             새 의뢰
@@ -171,15 +171,15 @@ export function AdminDashboard({ initialData }: { initialData: DashboardData }) 
         </p>
       ) : null}
 
-      <div className="mt-5 space-y-6">
+      <div className="mt-6 space-y-7">
         {grouped.map(({ status, draws }) => (
           <section key={status}>
             <div className="mb-3 flex items-center justify-between gap-3">
-              <h2 className="text-lg font-black text-slate-950">{DRAW_STATUS_LABEL[status]}</h2>
-              <span className="text-sm font-bold text-slate-500">{draws.length}건</span>
+              <h2 className="text-xl font-black text-slate-950">{DRAW_STATUS_LABEL[status]}</h2>
+              <span className="rounded-full bg-white px-3 py-1 text-sm font-black text-slate-500 shadow-sm ring-1 ring-slate-200">{draws.length}건</span>
             </div>
             {draws.length === 0 ? (
-              <div className="rounded-lg border border-dashed border-slate-200 bg-white px-4 py-6 text-center text-sm font-semibold text-slate-500">
+              <div className="rounded-2xl border border-dashed border-slate-200 bg-white/75 px-4 py-8 text-center text-sm font-bold text-slate-500 shadow-sm">
                 해당 상태의 의뢰가 없습니다.
               </div>
             ) : (
@@ -187,7 +187,7 @@ export function AdminDashboard({ initialData }: { initialData: DashboardData }) 
                 {draws.map((draw) => (
                   <article
                     key={draw.id}
-                    className="rounded-lg bg-white p-4 shadow-soft ring-1 ring-slate-200"
+                    className="rounded-3xl bg-white p-4 shadow-card ring-1 ring-slate-200/80 transition hover:-translate-y-0.5 hover:shadow-lift"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <Link href={`/admin/draws/${draw.id}`} className="min-w-0">
@@ -202,17 +202,17 @@ export function AdminDashboard({ initialData }: { initialData: DashboardData }) 
                     </div>
 
                     <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-                      <div className="rounded-lg bg-slate-50 px-2 py-3">
+                      <div className="rounded-2xl bg-slate-50 px-2 py-3 ring-1 ring-slate-100">
                         <p className="text-xs font-bold text-slate-500">참여자</p>
                         <p className="mt-1 text-xl font-black text-slate-950">{draw.participantCount}</p>
                       </div>
-                      <div className="rounded-lg bg-blue-50 px-2 py-3">
+                      <div className="rounded-2xl bg-blue-50 px-2 py-3 ring-1 ring-blue-100">
                         <p className="text-xs font-bold text-blue-700">남은 시간</p>
                         <p className="mt-1 text-xl font-black text-blue-700">
                           {remainingText(draw, serverOffset, clientNow)}
                         </p>
                       </div>
-                      <div className="rounded-lg bg-slate-50 px-2 py-3">
+                      <div className="rounded-2xl bg-slate-50 px-2 py-3 ring-1 ring-slate-100">
                         <p className="text-xs font-bold text-slate-500">당첨자</p>
                         <p className="mt-1 truncate text-base font-black text-slate-950">
                           {draw.winnerName ?? "-"}
@@ -228,18 +228,18 @@ export function AdminDashboard({ initialData }: { initialData: DashboardData }) 
                       </span>
                     </div>
 
-                    <div className="mt-4 grid grid-cols-[1fr_1fr_2.75rem] gap-2">
+                    <div className="mt-4 grid grid-cols-[1fr_1fr_2.9rem] gap-2">
                       <button
                         type="button"
                         onClick={() => copyJoinLink(draw)}
-                        className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-white px-3 text-sm font-bold text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-50"
+                        className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-white px-3 text-sm font-black text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-50"
                       >
                         <Copy size={16} aria-hidden />
                         링크
                       </button>
                       <Link
                         href={`/admin/draws/${draw.id}`}
-                        className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-slate-900 px-3 text-sm font-bold text-white transition hover:bg-slate-800"
+                        className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-slate-950 px-3 text-sm font-black text-white transition hover:bg-slate-800"
                       >
                         <ExternalLink size={16} aria-hidden />
                         상세
@@ -247,7 +247,7 @@ export function AdminDashboard({ initialData }: { initialData: DashboardData }) 
                       <button
                         type="button"
                         onClick={() => deleteDraw(draw)}
-                        className="inline-flex h-10 items-center justify-center rounded-lg bg-rose-50 text-rose-700 ring-1 ring-rose-200 transition hover:bg-rose-100"
+                        className="inline-flex h-11 items-center justify-center rounded-xl bg-rose-50 text-rose-700 ring-1 ring-rose-200 transition hover:bg-rose-100"
                         aria-label="의뢰 삭제"
                         title="의뢰 삭제"
                       >
