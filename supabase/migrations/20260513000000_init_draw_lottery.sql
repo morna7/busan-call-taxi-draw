@@ -6,7 +6,7 @@ create table if not exists public.draws (
   title text not null,
   origin text not null,
   destination text not null,
-  departure_time timestamptz,
+  departure_time text,
   estimated_fare text,
   customer_request text,
   admin_memo text,

@@ -3,7 +3,7 @@
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AlertCircle, CheckCircle2, Clock3, MapPin, Trophy, Users } from "lucide-react";
 import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
-import { formatCountdown, formatDateTimeKo } from "@/lib/time";
+import { formatCountdown, formatDateTimeKo, formatPlainText } from "@/lib/time";
 import type { PublicDrawState } from "@/lib/types";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 
@@ -283,7 +283,7 @@ export function JoinDrawClient({ publicCode }: { publicCode: string }) {
             </div>
             <div className="flex gap-2">
               <Clock3 className="mt-0.5 shrink-0 text-brand-600" size={20} aria-hidden />
-              <p>출발 예정: {formatDateTimeKo(state.draw.departureTime)}</p>
+              <p>출발 예정: {formatPlainText(state.draw.departureTime)}</p>
             </div>
             <div className="flex gap-2">
               <Users className="mt-0.5 shrink-0 text-brand-600" size={20} aria-hidden />

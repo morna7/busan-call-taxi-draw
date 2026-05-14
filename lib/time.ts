@@ -32,6 +32,11 @@ export function formatDateTimeKo(value: string | Date | null | undefined): strin
   }).format(date);
 }
 
+export function formatPlainText(value: string | null | undefined): string {
+  const text = value?.trim();
+  return text ? text : "-";
+}
+
 export function formatResultDateTime(value: string | Date | null | undefined): string {
   if (!value) {
     return "-";

@@ -32,15 +32,6 @@ const initialState: FormState = {
   startAt: ""
 };
 
-function toIsoOrNull(value: string) {
-  if (!value) {
-    return null;
-  }
-
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? null : date.toISOString();
-}
-
 export function DrawForm() {
   const router = useRouter();
   const [form, setForm] = useState<FormState>(initialState);
@@ -62,8 +53,8 @@ export function DrawForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...form,
-          departureTime: toIsoOrNull(form.departureTime),
-          startAt: toIsoOrNull(form.startAt)
+          departureTime: form.departureTime.trim() || null,
+          startAt: form.startAt ? new Date(form.startAt).toISOString() : null
         })
       });
       const payload = (await response.json()) as {
@@ -129,13 +120,13 @@ export function DrawForm() {
           </div>
           <Field label="출발 예정 시간">
             <TextInput
-              type="datetime-local"
               value={form.departureTime}
               onChange={(event) => update("departureTime", event.target.value)}
+              placeholder="예: 오늘 오후 3시, 2026-05-14 15:00"
               required
             />
           </Field>
-          <Field label="예상 요금" hint="선택 입력입니다. 예: 35만원">
+          <Field label="요금" hint="선택 입력입니다. 예: 35만원">
             <TextInput
               value={form.estimatedFare}
               onChange={(event) => update("estimatedFare", event.target.value)}

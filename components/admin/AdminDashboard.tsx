@@ -2,9 +2,9 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { Copy, ExternalLink, Plus, RefreshCw, Users } from "lucide-react";
+import { Copy, ExternalLink, Plus, RefreshCw, Trash2, Users } from "lucide-react";
 import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
-import { formatCountdown, formatDateTimeKo } from "@/lib/time";
+import { formatCountdown, formatDateTimeKo, formatPlainText } from "@/lib/time";
 import type { AdminDrawSummary, DrawStatus } from "@/lib/types";
 import { DRAW_STATUS_LABEL } from "@/lib/types";
 import { StatusBadge } from "@/components/ui/StatusBadge";
@@ -117,6 +117,31 @@ export function AdminDashboard({ initialData }: { initialData: DashboardData }) 
     window.setTimeout(() => setMessage(null), 1800);
   }
 
+  async function deleteDraw(draw: AdminDrawSummary) {
+    const confirmed = window.confirm(
+      `"${draw.title}" 의뢰를 삭제할까요?\n\n삭제하면 참여자와 추첨 결과도 함께 삭제되며 되돌릴 수 없습니다.`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    const response = await fetch(`/api/admin/draws/${draw.id}`, {
+      method: "DELETE"
+    });
+    const payload = (await response.json()) as { ok: boolean; message?: string };
+
+    if (!response.ok || !payload.ok) {
+      setMessage(payload.message || "의뢰를 삭제하지 못했습니다.");
+      window.setTimeout(() => setMessage(null), 2400);
+      return;
+    }
+
+    setMessage("의뢰를 삭제했습니다.");
+    await refresh();
+    window.setTimeout(() => setMessage(null), 1800);
+  }
+
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -196,29 +221,38 @@ export function AdminDashboard({ initialData }: { initialData: DashboardData }) 
                     </div>
 
                     <div className="mt-4 flex items-center justify-between gap-2 text-sm text-slate-500">
-                      <span>출발: {formatDateTimeKo(draw.departureTime)}</span>
+                      <span>출발: {formatPlainText(draw.departureTime)}</span>
                       <span className="inline-flex items-center gap-1 font-bold">
                         <Users size={15} aria-hidden />
                         {draw.participantCount}명
                       </span>
                     </div>
 
-                    <div className="mt-4 flex gap-2">
+                    <div className="mt-4 grid grid-cols-[1fr_1fr_2.75rem] gap-2">
                       <button
                         type="button"
                         onClick={() => copyJoinLink(draw)}
-                        className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-lg bg-white px-3 text-sm font-bold text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-50"
+                        className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-white px-3 text-sm font-bold text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-50"
                       >
                         <Copy size={16} aria-hidden />
                         링크
                       </button>
                       <Link
                         href={`/admin/draws/${draw.id}`}
-                        className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-lg bg-slate-900 px-3 text-sm font-bold text-white transition hover:bg-slate-800"
+                        className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-slate-900 px-3 text-sm font-bold text-white transition hover:bg-slate-800"
                       >
                         <ExternalLink size={16} aria-hidden />
                         상세
                       </Link>
+                      <button
+                        type="button"
+                        onClick={() => deleteDraw(draw)}
+                        className="inline-flex h-10 items-center justify-center rounded-lg bg-rose-50 text-rose-700 ring-1 ring-rose-200 transition hover:bg-rose-100"
+                        aria-label="의뢰 삭제"
+                        title="의뢰 삭제"
+                      >
+                        <Trash2 size={17} aria-hidden />
+                      </button>
                     </div>
                   </article>
                 ))}

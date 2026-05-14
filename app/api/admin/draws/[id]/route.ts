@@ -91,14 +91,8 @@ export async function PATCH(
     const value = validation.value;
     const startAt = new Date(value.startAt as string);
     const endAt = new Date(startAt.getTime() + value.durationSeconds * 1000);
-    const departureTime = value.departureTime ? new Date(value.departureTime) : null;
-
     if (endAt.getTime() <= now.getTime()) {
       throw new HttpError(400, "invalid_start_at", "예약 시간이 이미 마감된 범위입니다.");
-    }
-
-    if (departureTime && Number.isNaN(departureTime.getTime())) {
-      throw new HttpError(400, "invalid_departure_time", "출발 예정 시간이 올바르지 않습니다.");
     }
 
     const { data, error } = await client
@@ -107,7 +101,7 @@ export async function PATCH(
         title: value.title,
         origin: value.origin,
         destination: value.destination,
-        departure_time: departureTime?.toISOString() ?? null,
+        departure_time: value.departureTime,
         estimated_fare: value.estimatedFare,
         customer_request: value.customerRequest,
         admin_memo: value.adminMemo,
@@ -128,6 +122,44 @@ export async function PATCH(
 
     await insertAuditLog(client, id, "draw_updated", { updatedBy: user.id });
     return NextResponse.json({ ok: true, data });
+  } catch (error) {
+    return jsonError(error);
+  }
+}
+
+export async function DELETE(
+  _request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  try {
+    await requireAdminUser();
+    const { id } = await context.params;
+    const client = createSupabaseAdminClient();
+    const { data: draw, error: findError } = await client
+      .from("draws")
+      .select("id,title")
+      .eq("id", id)
+      .maybeSingle();
+
+    if (findError) {
+      throw findError;
+    }
+
+    if (!draw) {
+      throw new HttpError(404, "draw_not_found", "존재하지 않는 의뢰입니다.");
+    }
+
+    const { error } = await client.from("draws").delete().eq("id", id);
+
+    if (error) {
+      throw error;
+    }
+
+    return NextResponse.json({
+      ok: true,
+      message: "의뢰를 삭제했습니다.",
+      data: { id }
+    });
   } catch (error) {
     return jsonError(error);
   }

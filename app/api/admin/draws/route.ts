@@ -42,11 +42,6 @@ export async function POST(request: NextRequest) {
       throw new HttpError(400, "invalid_start_at", "예약 시간이 이미 마감된 범위입니다.");
     }
 
-    const departureTime = value.departureTime ? new Date(value.departureTime) : null;
-    if (departureTime && Number.isNaN(departureTime.getTime())) {
-      throw new HttpError(400, "invalid_departure_time", "출발 예정 시간이 올바르지 않습니다.");
-    }
-
     const client = createSupabaseAdminClient();
     let inserted: DrawRow | null = null;
     let lastError: unknown = null;
@@ -59,7 +54,7 @@ export async function POST(request: NextRequest) {
           title: value.title,
           origin: value.origin,
           destination: value.destination,
-          departure_time: departureTime?.toISOString() ?? null,
+          departure_time: value.departureTime,
           estimated_fare: value.estimatedFare,
           customer_request: value.customerRequest,
           admin_memo: value.adminMemo,

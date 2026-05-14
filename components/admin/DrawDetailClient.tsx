@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
 import { buildResultText } from "@/lib/result-text";
-import { formatCountdown, formatDateTimeKo, toDateTimeLocalInputValue } from "@/lib/time";
+import { formatCountdown, formatDateTimeKo, formatPlainText, toDateTimeLocalInputValue } from "@/lib/time";
 import type { AdminDrawDetail } from "@/lib/types";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { Field, TextArea, TextInput } from "@/components/ui/Field";
@@ -81,7 +81,7 @@ function createEditState(draw: AdminDrawDetail): EditState {
     title: draw.title,
     origin: draw.origin,
     destination: draw.destination,
-    departureTime: toDateTimeLocalInputValue(draw.departureTime),
+    departureTime: draw.departureTime ?? "",
     estimatedFare: draw.estimatedFare ?? "",
     customerRequest: draw.customerRequest ?? "",
     adminMemo: draw.adminMemo ?? "",
@@ -235,7 +235,7 @@ export function DrawDetailClient({ initialData }: { initialData: DetailData }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...edit,
-          departureTime: toIsoOrNull(edit.departureTime),
+          departureTime: edit.departureTime.trim() || null,
           startAt: toIsoOrNull(edit.startAt),
           startMode: "scheduled"
         })
@@ -316,7 +316,7 @@ export function DrawDetailClient({ initialData }: { initialData: DetailData }) {
           <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
             <div className="rounded-lg bg-slate-50 p-3">
               <dt className="font-bold text-slate-500">출발 예정 시간</dt>
-              <dd className="mt-1 font-black text-slate-950">{formatDateTimeKo(draw.departureTime)}</dd>
+              <dd className="mt-1 font-black text-slate-950">{formatPlainText(draw.departureTime)}</dd>
             </div>
             <div className="rounded-lg bg-blue-50 p-3">
               <dt className="font-bold text-blue-700">남은 시간</dt>
@@ -333,7 +333,7 @@ export function DrawDetailClient({ initialData }: { initialData: DetailData }) {
               <dd className="mt-1 font-black text-slate-950">{formatDateTimeKo(draw.endAt)}</dd>
             </div>
             <div className="rounded-lg bg-slate-50 p-3">
-              <dt className="font-bold text-slate-500">예상 요금</dt>
+              <dt className="font-bold text-slate-500">요금</dt>
               <dd className="mt-1 font-black text-slate-950">{draw.estimatedFare ?? "-"}</dd>
             </div>
             <div className="rounded-lg bg-slate-50 p-3">
@@ -445,14 +445,14 @@ export function DrawDetailClient({ initialData }: { initialData: DetailData }) {
               <TextInput value={edit.destination} onChange={(event) => setEdit({ ...edit, destination: event.target.value })} />
             </Field>
             <Field label="출발 예정 시간">
-              <TextInput type="datetime-local" value={edit.departureTime} onChange={(event) => setEdit({ ...edit, departureTime: event.target.value })} />
+              <TextInput value={edit.departureTime} onChange={(event) => setEdit({ ...edit, departureTime: event.target.value })} placeholder="예: 오늘 오후 3시, 2026-05-14 15:00" />
             </Field>
             <Field label="참여 제한 시간(초)">
               <TextInput type="number" min={30} max={3600} step={30} value={edit.durationSeconds} onChange={(event) => setEdit({ ...edit, durationSeconds: Number(event.target.value) })} />
             </Field>
           </div>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
-            <Field label="예상 요금">
+            <Field label="요금">
               <TextInput value={edit.estimatedFare} onChange={(event) => setEdit({ ...edit, estimatedFare: event.target.value })} />
             </Field>
             <Field label="관리자 메모">
