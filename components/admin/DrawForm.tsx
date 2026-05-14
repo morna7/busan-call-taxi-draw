@@ -56,13 +56,22 @@ export function DrawForm() {
     setSubmitting(true);
 
     try {
+      const scheduledStartAt =
+        form.startMode === "scheduled" && form.startAt ? new Date(form.startAt) : null;
+
+      if (form.startMode === "scheduled") {
+        if (!scheduledStartAt || Number.isNaN(scheduledStartAt.getTime())) {
+          throw new Error("참여 시작 시간이 올바르지 않습니다.");
+        }
+      }
+
       const response = await fetch("/api/admin/draws", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...form,
           departureTime: form.departureTime.trim() || null,
-          startAt: form.startAt ? new Date(form.startAt).toISOString() : null
+          startAt: scheduledStartAt ? scheduledStartAt.toISOString() : null
         })
       });
       const payload = (await response.json()) as {
