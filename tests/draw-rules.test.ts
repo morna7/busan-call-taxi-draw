@@ -20,7 +20,7 @@ describe("draw participation rules", () => {
     expect(result.code).toBe("draw_closed");
   });
 
-  it("detects duplicate name and phone last4 inside a draw", () => {
+  it("detects duplicate nickname and vehicle last4 inside a draw", () => {
     const participants = [
       { id: "p1", name: "홍길동", phone_last4: "1234" },
       { id: "p2", name: "김기사", phone_last4: null }

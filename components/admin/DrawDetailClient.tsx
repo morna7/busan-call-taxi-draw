@@ -508,14 +508,14 @@ export function DrawDetailClient({ initialData }: { initialData: DetailData }) {
                       ) : null}
                     </p>
                     <p className="mt-1 text-xs font-semibold text-slate-500 sm:hidden">
-                      {formatDateTimeKo(participant.joinedAt)} · 뒤 4자리 {participant.phoneLast4 ?? "-"}
+                      {formatDateTimeKo(participant.joinedAt)} · 차량번호 뒤 4자리 {participant.phoneLast4 ?? "-"}
                     </p>
                   </div>
                   <p className="hidden text-sm font-semibold text-slate-600 sm:block">
                     {formatDateTimeKo(participant.joinedAt)}
                   </p>
                   <p className="hidden text-sm font-black text-slate-700 sm:block">
-                    {participant.phoneLast4 ?? "-"}
+                    차량번호 {participant.phoneLast4 ?? "-"}
                   </p>
                 </div>
               ))}

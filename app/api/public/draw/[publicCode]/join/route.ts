@@ -18,8 +18,8 @@ export async function POST(
     const { publicCode } = await context.params;
     const body = await request.json().catch(() => ({}));
     const validation = validateParticipantInput({
-      name: body.name,
-      phoneLast4: body.phoneLast4
+      name: body.nickname ?? body.name,
+      phoneLast4: body.vehicleLast4 ?? body.phoneLast4
     });
 
     if (!validation.ok) {
@@ -104,7 +104,7 @@ export async function POST(
     await insertAuditLog(client, draw.id, "participant_joined", {
       participantId: inserted.id,
       name: validation.value.name,
-      hasPhoneLast4: Boolean(validation.value.phoneLast4)
+      hasVehicleLast4: Boolean(validation.value.phoneLast4)
     });
 
     const participantCount = await getParticipantCount(client, draw.id);

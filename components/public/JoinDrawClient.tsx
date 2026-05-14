@@ -59,8 +59,8 @@ function useRemainingSeconds(endAt?: string, serverNow?: string) {
 
 export function JoinDrawClient({ publicCode }: { publicCode: string }) {
   const [state, setState] = useState<PublicDrawState | null>(null);
-  const [name, setName] = useState("");
-  const [phoneLast4, setPhoneLast4] = useState("");
+  const [nickname, setNickname] = useState("");
+  const [vehicleLast4, setVehicleLast4] = useState("");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -82,8 +82,8 @@ export function JoinDrawClient({ publicCode }: { publicCode: string }) {
 
     setState(payload.data);
     if (payload.data.viewerParticipant) {
-      setName(payload.data.viewerParticipant.name);
-      setPhoneLast4(payload.data.viewerParticipant.phoneLast4 ?? "");
+      setNickname(payload.data.viewerParticipant.name);
+      setVehicleLast4(payload.data.viewerParticipant.phoneLast4 ?? "");
     }
   }, [publicCode]);
 
@@ -196,7 +196,12 @@ export function JoinDrawClient({ publicCode }: { publicCode: string }) {
       const response = await fetch(`/api/public/draw/${publicCode}/join`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, phoneLast4 })
+        body: JSON.stringify({
+          nickname,
+          vehicleLast4,
+          name: nickname,
+          phoneLast4: vehicleLast4
+        })
       });
       const payload = (await response.json()) as ApiResponse & { alreadyJoined?: boolean };
 
@@ -211,8 +216,8 @@ export function JoinDrawClient({ publicCode }: { publicCode: string }) {
           storageKey(publicCode),
           JSON.stringify({
             participantId: participant.id,
-            name: participant.name,
-            phoneLast4: participant.phoneLast4,
+            nickname: participant.name,
+            vehicleLast4: participant.phoneLast4,
             joinedAt: participant.joinedAt
           })
         );
@@ -302,7 +307,7 @@ export function JoinDrawClient({ publicCode }: { publicCode: string }) {
             <h2 className="mt-3 text-xl font-black text-slate-950">참여가 완료되었습니다</h2>
             <dl className="mt-4 space-y-2 text-sm text-slate-700">
               <div className="flex justify-between gap-3">
-                <dt className="font-bold text-slate-500">이름</dt>
+                <dt className="font-bold text-slate-500">닉네임</dt>
                 <dd className="font-black text-slate-950">{viewer.name}</dd>
               </div>
               <div className="flex justify-between gap-3">
@@ -312,7 +317,7 @@ export function JoinDrawClient({ publicCode }: { publicCode: string }) {
             </dl>
             {!completed ? (
               <p className="mt-4 rounded-lg bg-slate-50 px-3 py-3 text-sm font-semibold leading-6 text-slate-600">
-                추첨 결과를 기다리고 있습니다. 화면을 닫아도 같은 휴대폰 브라우저에서는 접수 내역이 유지됩니다.
+                추첨 결과를 기다리고 있습니다. 화면을 닫아도 같은 브라우저에서는 접수 내역이 유지됩니다.
               </p>
             ) : null}
           </section>
@@ -349,23 +354,23 @@ export function JoinDrawClient({ publicCode }: { publicCode: string }) {
         {!viewer && !completed && state.draw.status !== "cancelled" ? (
           <form onSubmit={onSubmit} className="mt-4 rounded-lg bg-white p-5 shadow-soft ring-1 ring-slate-200">
             <label className="block">
-              <span className="mb-1.5 block text-sm font-black text-slate-800">이름</span>
+              <span className="mb-1.5 block text-sm font-black text-slate-800">닉네임</span>
               <input
-                value={name}
-                onChange={(event) => setName(event.target.value)}
+                value={nickname}
+                onChange={(event) => setNickname(event.target.value)}
                 className="w-full rounded-lg border border-slate-200 px-3.5 py-3 text-base font-semibold focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-blue-100"
-                placeholder="기사님 이름"
-                autoComplete="name"
+                placeholder="사용할 닉네임"
+                autoComplete="nickname"
                 disabled={!canJoin || submitting}
               />
             </label>
             <label className="mt-3 block">
               <span className="mb-1.5 block text-sm font-black text-slate-800">
-                휴대폰 뒤 4자리 <span className="font-semibold text-slate-500">선택</span>
+                차량번호 뒤 4자리 <span className="font-semibold text-slate-500">선택</span>
               </span>
               <input
-                value={phoneLast4}
-                onChange={(event) => setPhoneLast4(event.target.value.replace(/\D/g, "").slice(0, 4))}
+                value={vehicleLast4}
+                onChange={(event) => setVehicleLast4(event.target.value.replace(/\D/g, "").slice(0, 4))}
                 className="w-full rounded-lg border border-slate-200 px-3.5 py-3 text-base font-semibold focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-blue-100"
                 placeholder="예: 1234"
                 inputMode="numeric"
@@ -373,7 +378,7 @@ export function JoinDrawClient({ publicCode }: { publicCode: string }) {
                 disabled={!canJoin || submitting}
               />
               <span className="mt-1 block text-xs leading-5 text-slate-500">
-                동명이인 구분을 위해 가능하면 입력해 주세요.
+                같은 닉네임 구분을 위해 가능하면 입력해 주세요.
               </span>
             </label>
             {error ? <p className="mt-3 text-sm font-bold text-rose-700">{error}</p> : null}

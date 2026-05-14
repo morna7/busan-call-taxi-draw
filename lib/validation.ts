@@ -42,13 +42,13 @@ export function validateParticipantInput(input: ParticipantInput): {
   const phoneLast4 = normalizePhoneLast4(input.phoneLast4);
 
   if (!name) {
-    return { ok: false, message: "이름을 입력해 주세요.", code: "name_required" };
+    return { ok: false, message: "닉네임을 입력해 주세요.", code: "name_required" };
   }
 
   if (phoneLast4 && !/^\d{4}$/.test(phoneLast4)) {
     return {
       ok: false,
-      message: "휴대폰 뒤 4자리는 숫자 4자리로 입력해 주세요.",
+      message: "차량번호 뒤 4자리는 숫자 4자리로 입력해 주세요.",
       code: "invalid_phone_last4"
     };
   }
