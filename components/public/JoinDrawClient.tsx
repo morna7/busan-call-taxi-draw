@@ -1,7 +1,15 @@
 "use client";
 
-import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { AlertCircle, CheckCircle2, Clock3, MapPin, Trophy, Users } from "lucide-react";
+import {
+  CSSProperties,
+  FormEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from "react";
+import { AlertCircle, Banknote, CheckCircle2, Clock3, MapPin, Trophy, Users } from "lucide-react";
 import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
 import { formatCountdown, formatDateTimeKo, formatPlainText } from "@/lib/time";
 import type { PublicDrawState } from "@/lib/types";
@@ -55,6 +63,67 @@ function useRemainingSeconds(endAt?: string, serverNow?: string) {
   }, [endAt, serverNow]);
 
   return remaining;
+}
+
+function LotteryMachine({ state }: { state: PublicDrawState }) {
+  const participants = state.publicParticipants ?? [];
+  const visibleParticipants = participants.slice(-12);
+  const completed = state.draw.status === "completed";
+  const winnerParticipant = participants.find((participant) => participant.isWinner);
+  const winnerName = state.draw.winnerName ?? winnerParticipant?.name ?? null;
+
+  return (
+    <section className="mt-4 rounded-lg bg-white p-5 shadow-soft ring-1 ring-slate-200">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <h2 className="text-lg font-black text-slate-950">추첨 공</h2>
+          <p className="mt-1 text-sm font-semibold text-slate-500">
+            참여하면 닉네임 공이 추가됩니다.
+          </p>
+        </div>
+        <span className="rounded-full bg-brand-50 px-3 py-1 text-xs font-black text-brand-700 ring-1 ring-blue-100">
+          {participants.length}개
+        </span>
+      </div>
+
+      <div className="lottery-stage mt-4">
+        <div className={`lottery-drum ${completed ? "is-finished" : "is-spinning"}`}>
+          {visibleParticipants.length > 0 ? (
+            visibleParticipants.map((participant, index) => {
+              const angle = `${(360 / visibleParticipants.length) * index}deg`;
+              return (
+                <div
+                  key={participant.id}
+                  className={`lottery-ball ${participant.isWinner ? "is-winner" : ""}`}
+                  style={
+                    {
+                      "--ball-angle": angle,
+                      "--ball-delay": `${index * -0.32}s`
+                    } as CSSProperties
+                  }
+                >
+                  <span>{participant.name}</span>
+                </div>
+              );
+            })
+          ) : (
+            <div className="flex h-full items-center justify-center px-8 text-center text-sm font-bold leading-6 text-slate-500">
+              아직 참여자가 없습니다.
+            </div>
+          )}
+        </div>
+
+        {completed && winnerName ? (
+          <div className="winner-chute" aria-live="polite">
+            <div className="winner-ball">
+              <span>{winnerName}</span>
+            </div>
+            <p className="text-sm font-black text-amber-700">당첨 공</p>
+          </div>
+        ) : null}
+      </div>
+    </section>
+  );
 }
 
 export function JoinDrawClient({ publicCode }: { publicCode: string }) {
@@ -285,6 +354,12 @@ export function JoinDrawClient({ publicCode }: { publicCode: string }) {
               <Clock3 className="mt-0.5 shrink-0 text-brand-600" size={20} aria-hidden />
               <p>출발 예정: {formatPlainText(state.draw.departureTime)}</p>
             </div>
+            {state.draw.estimatedFare ? (
+              <div className="flex gap-2">
+                <Banknote className="mt-0.5 shrink-0 text-brand-600" size={20} aria-hidden />
+                <p>요금: {state.draw.estimatedFare}</p>
+              </div>
+            ) : null}
             <div className="flex gap-2">
               <Users className="mt-0.5 shrink-0 text-brand-600" size={20} aria-hidden />
               <p>현재 참여자 {state.participantCount}명</p>
@@ -300,6 +375,8 @@ export function JoinDrawClient({ publicCode }: { publicCode: string }) {
             </p>
           </div>
         </section>
+
+        <LotteryMachine state={state} />
 
         {viewer ? (
           <section className="mt-4 rounded-lg bg-white p-5 shadow-soft ring-1 ring-slate-200">

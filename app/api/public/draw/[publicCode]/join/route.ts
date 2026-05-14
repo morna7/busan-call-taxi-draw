@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getJoinEligibility, participantDuplicateKey } from "@/lib/draw-rules";
-import { getParticipantCount, insertAuditLog, openDrawIfNeeded, toPublicDrawState } from "@/lib/draw-service";
+import {
+  getParticipantCount,
+  getPublicParticipants,
+  insertAuditLog,
+  openDrawIfNeeded,
+  toPublicDrawState
+} from "@/lib/draw-service";
 import { hashUserAgent } from "@/lib/hash";
 import { HttpError, jsonError } from "@/lib/http";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
@@ -66,7 +72,10 @@ export async function POST(
     });
 
     if (duplicate) {
-      const participantCount = await getParticipantCount(client, draw.id);
+      const [participantCount, publicParticipants] = await Promise.all([
+        getParticipantCount(client, draw.id),
+        getPublicParticipants(client, draw.id)
+      ]);
       return NextResponse.json({
         ok: true,
         alreadyJoined: true,
@@ -76,6 +85,7 @@ export async function POST(
           participantCount,
           winner: null,
           viewerParticipant: duplicate,
+          publicParticipants,
           serverNow: now
         })
       });
@@ -107,7 +117,10 @@ export async function POST(
       hasVehicleLast4: Boolean(validation.value.phoneLast4)
     });
 
-    const participantCount = await getParticipantCount(client, draw.id);
+    const [participantCount, publicParticipants] = await Promise.all([
+      getParticipantCount(client, draw.id),
+      getPublicParticipants(client, draw.id)
+    ]);
 
     return NextResponse.json({
       ok: true,
@@ -118,6 +131,7 @@ export async function POST(
         participantCount,
         winner: null,
         viewerParticipant: inserted as ParticipantRow,
+        publicParticipants,
         serverNow: now
       })
     });

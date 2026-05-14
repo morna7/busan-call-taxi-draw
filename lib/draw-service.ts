@@ -71,14 +71,46 @@ export async function getParticipantCount(client: SupabaseClient, drawId: string
   return count ?? 0;
 }
 
+export async function getPublicParticipants(client: SupabaseClient, drawId: string) {
+  const { data, error } = await client
+    .from("participants")
+    .select("id, name, is_winner")
+    .eq("draw_id", drawId)
+    .order("joined_at", { ascending: true });
+
+  if (error) {
+    throw error;
+  }
+
+  return ((data as Pick<ParticipantRow, "id" | "name" | "is_winner">[] | null) ?? []).map(
+    (participant) => ({
+      id: participant.id,
+      name: participant.name,
+      isWinner: participant.is_winner
+    })
+  );
+}
+
 export function toPublicDrawState(args: {
   draw: DrawRow;
   participantCount: number;
   winner: ParticipantRow | null;
   viewerParticipant: ParticipantRow | null;
+  publicParticipants?: Array<{
+    id: string;
+    name: string;
+    isWinner: boolean;
+  }>;
   serverNow?: Date;
 }): PublicDrawState {
-  const { draw, participantCount, winner, viewerParticipant, serverNow = new Date() } = args;
+  const {
+    draw,
+    participantCount,
+    winner,
+    viewerParticipant,
+    publicParticipants = [],
+    serverNow = new Date()
+  } = args;
 
   return {
     serverNow: serverNow.toISOString(),
@@ -99,6 +131,7 @@ export function toPublicDrawState(args: {
       drawnAt: draw.drawn_at
     },
     participantCount,
+    publicParticipants,
     viewerParticipant: viewerParticipant
       ? {
           id: viewerParticipant.id,

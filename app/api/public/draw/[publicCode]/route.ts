@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { jsonError, HttpError } from "@/lib/http";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { getParticipantCount, openDrawIfNeeded, toPublicDrawState } from "@/lib/draw-service";
+import {
+  getParticipantCount,
+  getPublicParticipants,
+  openDrawIfNeeded,
+  toPublicDrawState
+} from "@/lib/draw-service";
 import type { DrawRow, ParticipantRow } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -32,8 +37,9 @@ export async function GET(
     }
 
     const draw = await openDrawIfNeeded(client, rawDraw as DrawRow, now);
-    const [participantCount, winnerResult, viewerResult] = await Promise.all([
+    const [participantCount, publicParticipants, winnerResult, viewerResult] = await Promise.all([
       getParticipantCount(client, draw.id),
+      getPublicParticipants(client, draw.id),
       draw.winner_participant_id
         ? client
             .from("participants")
@@ -66,6 +72,7 @@ export async function GET(
         participantCount,
         winner: (winnerResult.data as ParticipantRow | null) ?? null,
         viewerParticipant: (viewerResult.data as ParticipantRow | null) ?? null,
+        publicParticipants,
         serverNow: now
       })
     });

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { finalizeDraw } from "@/lib/draw-finalizer";
-import { getParticipantCount, toPublicDrawState } from "@/lib/draw-service";
+import { getParticipantCount, getPublicParticipants, toPublicDrawState } from "@/lib/draw-service";
 import { HttpError, jsonError } from "@/lib/http";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseDrawRepository } from "@/lib/supabase/draw-repository";
@@ -35,8 +35,9 @@ export async function POST(
     const repository = createSupabaseDrawRepository(client);
     const result = await finalizeDraw(repository, (draw as DrawRow).id, { trigger: "public" });
     const latestDraw = result.draw ?? (draw as DrawRow);
-    const [participantCount, viewerResult] = await Promise.all([
+    const [participantCount, publicParticipants, viewerResult] = await Promise.all([
       getParticipantCount(client, latestDraw.id),
+      getPublicParticipants(client, latestDraw.id),
       participantId
         ? client
             .from("participants")
@@ -60,6 +61,7 @@ export async function POST(
         participantCount,
         winner: result.winner,
         viewerParticipant: (viewerResult.data as ParticipantRow | null) ?? null,
+        publicParticipants,
         serverNow: new Date()
       })
     });

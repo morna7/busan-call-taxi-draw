@@ -1,3 +1,5 @@
+drop view if exists public.public_draws;
+
 do $$
 begin
   if exists (
@@ -16,3 +18,25 @@ begin
       end;
   end if;
 end $$;
+
+create or replace view public.public_draws as
+select
+  id,
+  public_code,
+  title,
+  origin,
+  destination,
+  departure_time,
+  estimated_fare,
+  status,
+  start_at,
+  end_at,
+  duration_seconds,
+  winner_participant_id,
+  drawn_at,
+  cancelled_at,
+  created_at,
+  updated_at
+from public.draws;
+
+grant select on public.public_draws to anon, authenticated;

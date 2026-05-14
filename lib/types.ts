@@ -64,6 +64,11 @@ export type PublicDrawState = {
     drawnAt: string | null;
   };
   participantCount: number;
+  publicParticipants: Array<{
+    id: string;
+    name: string;
+    isWinner: boolean;
+  }>;
   viewerParticipant: {
     id: string;
     name: string;
