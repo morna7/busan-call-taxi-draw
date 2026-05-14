@@ -19,22 +19,30 @@ type FormState = {
   startAt: string;
 };
 
-const initialState: FormState = {
-  title: "",
-  origin: "",
-  destination: "",
-  departureTime: "",
-  estimatedFare: "",
-  customerRequest: "",
-  adminMemo: "",
-  durationSeconds: 180,
-  startMode: "now",
-  startAt: ""
-};
+function getCurrentDateTimeLocalValue() {
+  const now = new Date();
+  const offsetMs = now.getTimezoneOffset() * 60 * 1000;
+  return new Date(now.getTime() - offsetMs).toISOString().slice(0, 16);
+}
+
+function createInitialState(): FormState {
+  return {
+    title: "",
+    origin: "",
+    destination: "",
+    departureTime: "",
+    estimatedFare: "",
+    customerRequest: "",
+    adminMemo: "",
+    durationSeconds: 180,
+    startMode: "now",
+    startAt: getCurrentDateTimeLocalValue()
+  };
+}
 
 export function DrawForm() {
   const router = useRouter();
-  const [form, setForm] = useState<FormState>(initialState);
+  const [form, setForm] = useState<FormState>(() => createInitialState());
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -164,7 +172,13 @@ export function DrawForm() {
           </button>
           <button
             type="button"
-            onClick={() => update("startMode", "scheduled")}
+            onClick={() => {
+              setForm((current) => ({
+                ...current,
+                startMode: "scheduled",
+                startAt: getCurrentDateTimeLocalValue()
+              }));
+            }}
             className={`rounded-md px-3 py-3 text-sm font-black transition ${
               form.startMode === "scheduled" ? "bg-white text-brand-700 shadow-sm" : "text-slate-600"
             }`}
