@@ -452,28 +452,15 @@ function ResultCopyButton({ state }: { state: PublicDrawState }) {
             alt="추첨 결과 이미지 미리보기"
             className="w-full rounded-xl bg-white shadow-sm ring-1 ring-amber-100"
           />
-          <div className="mt-3 grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={() => {
-                if (previewBlobRef.current) {
-                  downloadResultImage(previewBlobRef.current);
-                }
-              }}
-              className="min-h-11 rounded-xl bg-white px-3 text-sm font-black text-slate-800 ring-1 ring-amber-200"
-            >
-              이미지 저장
-            </button>
-            <button
-              type="button"
-              onClick={openCurrentPageInExternalBrowser}
-              className="min-h-11 rounded-xl bg-slate-950 px-3 text-sm font-black text-white"
-            >
-              외부 브라우저
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={openCurrentPageInExternalBrowser}
+            className="mt-3 min-h-11 w-full rounded-xl bg-slate-950 px-3 text-sm font-black text-white"
+          >
+            외부 브라우저에서 열기
+          </button>
           <p className="mt-2 text-xs font-bold leading-5 text-amber-800">
-            카카오톡 안에서는 이미지를 직접 붙여넣기 어렵습니다. 이미지를 저장한 뒤 채팅방에서 사진으로 첨부하거나 외부 브라우저에서 공유해 주세요.
+            카카오톡 안에서는 이미지 복사/공유가 제한됩니다. 외부 브라우저에서 연 뒤 다시 `추첨 결과 이미지 복사/공유` 버튼을 눌러 공유해 주세요.
           </p>
         </div>
       ) : null}
