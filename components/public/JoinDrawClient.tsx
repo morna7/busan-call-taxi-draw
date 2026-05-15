@@ -125,6 +125,38 @@ function isMobileLikeBrowser() {
   );
 }
 
+function isKakaoInAppBrowser() {
+  return /KAKAOTALK|KakaoTalk/i.test(navigator.userAgent);
+}
+
+function createResultTextForPublicDraw(state: PublicDrawState) {
+  return [
+    "[장거리전문부산콜택시 배차 추첨 결과]",
+    `의뢰: ${state.draw.title}`,
+    `출발지: ${state.draw.origin}`,
+    `도착지: ${state.draw.destination}`,
+    `출발 예정: ${formatPlainText(state.draw.departureTime)}`,
+    state.draw.estimatedFare ? `요금: ${state.draw.estimatedFare}` : null,
+    `참여자 수: ${state.participantCount}명`,
+    `당첨자: ${state.draw.winnerName ?? "참여자 없음"}`,
+    `추첨 완료 시간: ${formatDateTimeKo(state.draw.drawnAt)}`
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
+function openCurrentPageInExternalBrowser() {
+  const url = window.location.href;
+
+  if (/Android/i.test(navigator.userAgent)) {
+    const withoutScheme = url.replace(/^https?:\/\//, "");
+    window.location.href = `intent://${withoutScheme}#Intent;scheme=https;package=com.android.chrome;end`;
+    return;
+  }
+
+  window.open(url, "_blank", "noopener,noreferrer");
+}
+
 function downloadResultImage(blob: Blob) {
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
@@ -255,6 +287,25 @@ function LotteryMachine({ state }: { state: PublicDrawState }) {
 function ResultCopyButton({ state }: { state: PublicDrawState }) {
   const [copying, setCopying] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const previewBlobRef = useRef<Blob | null>(null);
+
+  function setPreviewBlob(blob: Blob) {
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+
+    previewBlobRef.current = blob;
+    setPreviewUrl(URL.createObjectURL(blob));
+  }
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
 
   async function onCopyResultImage() {
     setCopying(true);
@@ -344,6 +395,23 @@ function ResultCopyButton({ state }: { state: PublicDrawState }) {
         drawWrappedText(context, state.draw.customerRequest, 108, 1180, 850, 36, 2);
       }
 
+      const blob = await canvasToPngBlob(canvas);
+
+      if (isKakaoInAppBrowser()) {
+        setPreviewBlob(blob);
+
+        try {
+          await navigator.clipboard?.writeText(createResultTextForPublicDraw(state));
+        } catch {
+          // Kakao in-app browser often blocks clipboard writes. The image preview remains available.
+        }
+
+        setMessage(
+          "카카오톡 내부 브라우저는 이미지 복사/공유가 제한됩니다. 아래 이미지를 길게 눌러 저장하거나, 외부 브라우저로 열어서 공유해 주세요."
+        );
+        return;
+      }
+
       const resultMessage = await copyResultCanvasToClipboard(canvas);
       setMessage(resultMessage);
     } catch (caught) {
@@ -374,6 +442,40 @@ function ResultCopyButton({ state }: { state: PublicDrawState }) {
         <p className="mt-2 rounded-2xl bg-slate-50 px-3 py-2 text-sm font-bold leading-5 text-slate-600">
           {message}
         </p>
+      ) : null}
+      {previewUrl ? (
+        <div className="mt-3 rounded-2xl bg-amber-50 p-3 ring-1 ring-amber-100">
+          {/* Blob URLs cannot be optimized by next/image. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={previewUrl}
+            alt="추첨 결과 이미지 미리보기"
+            className="w-full rounded-xl bg-white shadow-sm ring-1 ring-amber-100"
+          />
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                if (previewBlobRef.current) {
+                  downloadResultImage(previewBlobRef.current);
+                }
+              }}
+              className="min-h-11 rounded-xl bg-white px-3 text-sm font-black text-slate-800 ring-1 ring-amber-200"
+            >
+              이미지 저장
+            </button>
+            <button
+              type="button"
+              onClick={openCurrentPageInExternalBrowser}
+              className="min-h-11 rounded-xl bg-slate-950 px-3 text-sm font-black text-white"
+            >
+              외부 브라우저
+            </button>
+          </div>
+          <p className="mt-2 text-xs font-bold leading-5 text-amber-800">
+            카카오톡 안에서는 이미지를 직접 붙여넣기 어렵습니다. 이미지를 저장한 뒤 채팅방에서 사진으로 첨부하거나 외부 브라우저에서 공유해 주세요.
+          </p>
+        </div>
       ) : null}
     </div>
   );
