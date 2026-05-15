@@ -109,6 +109,203 @@ function drawWrappedText(
   });
 }
 
+function drawShareResultConfetti(context: CanvasRenderingContext2D) {
+  const pieces = [
+    [94, 250, "#f59e0b", 0.2],
+    [190, 210, "#38bdf8", -0.4],
+    [346, 250, "#22c55e", 0.5],
+    [760, 230, "#f43f5e", -0.2],
+    [930, 278, "#facc15", 0.4],
+    [844, 1090, "#60a5fa", -0.5],
+    [154, 1125, "#fb7185", 0.3],
+    [945, 1015, "#34d399", 0.2]
+  ] as const;
+
+  pieces.forEach(([x, y, color, rotate]) => {
+    context.save();
+    context.translate(x, y);
+    context.rotate(rotate);
+    context.fillStyle = color;
+    context.beginPath();
+    context.roundRect(-15, -7, 30, 14, 5);
+    context.fill();
+    context.restore();
+  });
+}
+
+function drawShareDriverCharacter(context: CanvasRenderingContext2D, x: number, y: number) {
+  context.save();
+  context.translate(x, y);
+
+  context.fillStyle = "#dbeafe";
+  context.beginPath();
+  context.roundRect(-96, 118, 220, 34, 17);
+  context.fill();
+
+  context.fillStyle = "#1f7ae0";
+  context.beginPath();
+  context.roundRect(-70, 36, 135, 98, 30);
+  context.fill();
+
+  context.fillStyle = "#f8c9a6";
+  context.beginPath();
+  context.arc(0, -12, 54, 0, Math.PI * 2);
+  context.fill();
+
+  context.fillStyle = "#0f172a";
+  context.beginPath();
+  context.arc(-16, -18, 5, 0, Math.PI * 2);
+  context.arc(20, -18, 5, 0, Math.PI * 2);
+  context.fill();
+
+  context.strokeStyle = "#0f172a";
+  context.lineWidth = 5;
+  context.lineCap = "round";
+  context.beginPath();
+  context.arc(4, 0, 20, 0.22 * Math.PI, 0.78 * Math.PI);
+  context.stroke();
+
+  context.fillStyle = "#123f79";
+  context.beginPath();
+  context.arc(0, -54, 55, Math.PI, Math.PI * 2);
+  context.lineTo(56, -42);
+  context.lineTo(-56, -42);
+  context.closePath();
+  context.fill();
+
+  context.fillStyle = "#facc15";
+  context.beginPath();
+  context.roundRect(-38, -73, 76, 24, 12);
+  context.fill();
+
+  context.fillStyle = "#123f79";
+  context.font = "900 18px Arial, Malgun Gothic, sans-serif";
+  context.textAlign = "center";
+  context.fillText("TAXI", 0, -55);
+
+  context.strokeStyle = "#f8c9a6";
+  context.lineWidth = 22;
+  context.lineCap = "round";
+  context.beginPath();
+  context.moveTo(58, 58);
+  context.lineTo(112, 15);
+  context.stroke();
+
+  context.fillStyle = "#f8c9a6";
+  context.beginPath();
+  context.arc(124, 0, 20, 0, Math.PI * 2);
+  context.fill();
+  context.fillStyle = "#f8c9a6";
+  context.beginPath();
+  context.roundRect(116, -38, 18, 46, 9);
+  context.fill();
+
+  context.fillStyle = "#ffffff";
+  context.font = "900 24px Arial, Malgun Gothic, sans-serif";
+  context.fillText("GOOD", 0, 96);
+  context.textAlign = "left";
+  context.restore();
+}
+
+function drawShareResultImage(context: CanvasRenderingContext2D, state: PublicDrawState) {
+  context.fillStyle = "#f7fafc";
+  context.fillRect(0, 0, 1080, 1320);
+
+  const headerGradient = context.createLinearGradient(0, 0, 1080, 280);
+  headerGradient.addColorStop(0, "#15539e");
+  headerGradient.addColorStop(0.58, "#1d4ed8");
+  headerGradient.addColorStop(1, "#0f172a");
+  context.fillStyle = headerGradient;
+  context.fillRect(0, 0, 1080, 285);
+
+  drawShareResultConfetti(context);
+
+  context.fillStyle = "rgba(255,255,255,0.18)";
+  context.beginPath();
+  context.arc(930, 96, 92, 0, Math.PI * 2);
+  context.fill();
+
+  context.fillStyle = "#ffffff";
+  context.font = "800 35px Arial, Malgun Gothic, sans-serif";
+  context.fillText("장거리전문부산콜택시", 72, 82);
+  context.font = "900 64px Arial, Malgun Gothic, sans-serif";
+  context.fillText("배차 추첨 결과", 72, 166);
+  context.font = "800 28px Arial, Malgun Gothic, sans-serif";
+  context.fillStyle = "#dbeafe";
+  context.fillText("공정 추첨으로 배정이 완료되었습니다.", 72, 218);
+
+  context.fillStyle = "#ffffff";
+  context.beginPath();
+  context.arc(902, 132, 78, 0, Math.PI * 2);
+  context.fill();
+  context.fillStyle = "#f59e0b";
+  context.beginPath();
+  context.arc(902, 132, 62, 0, Math.PI * 2);
+  context.fill();
+  context.fillStyle = "#78350f";
+  context.font = "900 28px Arial, Malgun Gothic, sans-serif";
+  context.textAlign = "center";
+  context.fillText("당첨", 902, 125);
+  context.fillText("공", 902, 159);
+  context.textAlign = "left";
+
+  context.fillStyle = "#ffffff";
+  context.strokeStyle = "#dbeafe";
+  context.lineWidth = 4;
+  context.beginPath();
+  context.roundRect(58, 330, 964, 850, 38);
+  context.fill();
+  context.stroke();
+
+  context.fillStyle = "#0f172a";
+  context.font = "900 52px Arial, Malgun Gothic, sans-serif";
+  drawWrappedText(context, state.draw.title, 108, 410, 610, 60, 2);
+
+  drawShareDriverCharacter(context, 835, 520);
+
+  context.font = "800 33px Arial, Malgun Gothic, sans-serif";
+  context.fillStyle = "#334155";
+  context.fillText(`출발지: ${state.draw.origin}`, 108, 560);
+  context.fillText(`도착지: ${state.draw.destination}`, 108, 622);
+  context.fillText(`출발 예정: ${formatPlainText(state.draw.departureTime)}`, 108, 684);
+  if (state.draw.estimatedFare) {
+    context.fillText(`요금: ${state.draw.estimatedFare}`, 108, 746);
+  }
+  context.fillText(`참여자 수: ${state.participantCount}명`, 108, 808);
+
+  const winnerGradient = context.createLinearGradient(108, 858, 972, 1055);
+  winnerGradient.addColorStop(0, "#fff7cc");
+  winnerGradient.addColorStop(0.45, "#fef3c7");
+  winnerGradient.addColorStop(1, "#f59e0b");
+  context.fillStyle = winnerGradient;
+  context.beginPath();
+  context.roundRect(108, 858, 864, 190, 32);
+  context.fill();
+
+  context.fillStyle = "rgba(255,255,255,0.58)";
+  context.beginPath();
+  context.arc(885, 920, 70, 0, Math.PI * 2);
+  context.fill();
+
+  context.fillStyle = "#92400e";
+  context.font = "900 34px Arial, Malgun Gothic, sans-serif";
+  context.fillText("당첨자", 150, 925);
+  context.font = "900 76px Arial, Malgun Gothic, sans-serif";
+  drawWrappedText(context, state.draw.winnerName ?? "참여자 없음", 150, 1000, 700, 76, 1);
+
+  context.fillStyle = "#475569";
+  context.font = "800 29px Arial, Malgun Gothic, sans-serif";
+  context.fillText(`추첨 완료 시간: ${formatDateTimeKo(state.draw.drawnAt)}`, 108, 1125);
+
+  if (state.draw.customerRequest) {
+    context.fillStyle = "#64748b";
+    context.font = "700 24px Arial, Malgun Gothic, sans-serif";
+    context.fillText("고객 요청사항", 108, 1218);
+    context.font = "600 23px Arial, Malgun Gothic, sans-serif";
+    drawWrappedText(context, state.draw.customerRequest, 108, 1260, 850, 34, 2);
+  }
+}
+
 async function canvasToPngBlob(canvas: HTMLCanvasElement) {
   const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/png"));
   if (!blob) {
@@ -321,79 +518,7 @@ function ResultCopyButton({ state }: { state: PublicDrawState }) {
         throw new Error("결과 이미지를 만들지 못했습니다.");
       }
 
-      context.fillStyle = "#f8fafc";
-      context.fillRect(0, 0, canvas.width, canvas.height);
-
-      context.fillStyle = "#1d4ed8";
-      context.fillRect(0, 0, canvas.width, 230);
-
-      context.fillStyle = "#ffffff";
-      context.font = "800 34px Arial, Malgun Gothic, sans-serif";
-      context.fillText("장거리전문부산콜택시", 72, 82);
-      context.font = "900 58px Arial, Malgun Gothic, sans-serif";
-      context.fillText("배차 추첨 결과", 72, 160);
-
-      context.fillStyle = "#ffffff";
-      context.beginPath();
-      context.arc(902, 120, 72, 0, Math.PI * 2);
-      context.fill();
-      context.fillStyle = "#f59e0b";
-      context.beginPath();
-      context.arc(902, 120, 58, 0, Math.PI * 2);
-      context.fill();
-      context.fillStyle = "#78350f";
-      context.font = "900 26px Arial, Malgun Gothic, sans-serif";
-      context.textAlign = "center";
-      context.fillText("당첨", 902, 113);
-      context.fillText("공", 902, 145);
-      context.textAlign = "left";
-
-      context.fillStyle = "#ffffff";
-      context.strokeStyle = "#dbeafe";
-      context.lineWidth = 3;
-      context.beginPath();
-      context.roundRect(60, 280, 960, 920, 32);
-      context.fill();
-      context.stroke();
-
-      context.fillStyle = "#0f172a";
-      context.font = "900 48px Arial, Malgun Gothic, sans-serif";
-      drawWrappedText(context, state.draw.title, 108, 370, 840, 58, 2);
-
-      context.font = "700 34px Arial, Malgun Gothic, sans-serif";
-      context.fillStyle = "#334155";
-      context.fillText(`출발지: ${state.draw.origin}`, 108, 505);
-      context.fillText(`도착지: ${state.draw.destination}`, 108, 570);
-      context.fillText(`출발 예정: ${formatPlainText(state.draw.departureTime)}`, 108, 635);
-
-      if (state.draw.estimatedFare) {
-        context.fillText(`요금: ${state.draw.estimatedFare}`, 108, 700);
-      }
-
-      context.fillText(`참여자 수: ${state.participantCount}명`, 108, 765);
-
-      context.fillStyle = "#fef3c7";
-      context.beginPath();
-      context.roundRect(108, 825, 864, 150, 26);
-      context.fill();
-
-      context.fillStyle = "#92400e";
-      context.font = "900 34px Arial, Malgun Gothic, sans-serif";
-      context.fillText("당첨자", 150, 882);
-      context.font = "900 56px Arial, Malgun Gothic, sans-serif";
-      context.fillText(state.draw.winnerName ?? "참여자 없음", 150, 945);
-
-      context.fillStyle = "#475569";
-      context.font = "700 30px Arial, Malgun Gothic, sans-serif";
-      context.fillText(`추첨 완료 시간: ${formatDateTimeKo(state.draw.drawnAt)}`, 108, 1065);
-
-      if (state.draw.customerRequest) {
-        context.fillStyle = "#64748b";
-        context.font = "700 26px Arial, Malgun Gothic, sans-serif";
-        context.fillText("고객 요청사항", 108, 1135);
-        context.font = "600 25px Arial, Malgun Gothic, sans-serif";
-        drawWrappedText(context, state.draw.customerRequest, 108, 1180, 850, 36, 2);
-      }
+      drawShareResultImage(context, state);
 
       const blob = await canvasToPngBlob(canvas);
 
@@ -468,6 +593,38 @@ function ResultCopyButton({ state }: { state: PublicDrawState }) {
   );
 }
 
+function TaxiDriverThumbsUp() {
+  return (
+    <div className="result-driver-figure" aria-hidden>
+      <svg viewBox="0 0 220 220" className="h-full w-full">
+        <ellipse cx="112" cy="194" rx="74" ry="14" fill="#dbeafe" opacity="0.8" />
+        <path
+          d="M59 118c0-30 24-54 54-54s54 24 54 54v46H59v-46Z"
+          fill="#1f7ae0"
+        />
+        <path d="M68 121h90v43H68z" fill="#1767c3" opacity="0.7" />
+        <circle cx="112" cy="76" r="43" fill="#f8c9a6" />
+        <path
+          d="M69 62c8-29 31-42 63-33 22 6 37 20 42 42-30-12-69-13-105-9Z"
+          fill="#123f79"
+        />
+        <rect x="82" y="25" width="62" height="23" rx="11.5" fill="#facc15" />
+        <text x="113" y="42" textAnchor="middle" fontSize="15" fontWeight="900" fill="#123f79">
+          TAXI
+        </text>
+        <circle cx="98" cy="77" r="4.5" fill="#0f172a" />
+        <circle cx="126" cy="77" r="4.5" fill="#0f172a" />
+        <path d="M96 96c10 12 25 12 35 0" fill="none" stroke="#0f172a" strokeWidth="5" strokeLinecap="round" />
+        <path d="M154 118c18-5 31-17 42-37" fill="none" stroke="#f8c9a6" strokeWidth="18" strokeLinecap="round" />
+        <circle cx="200" cy="72" r="15" fill="#f8c9a6" />
+        <rect x="195" y="38" width="15" height="40" rx="7.5" fill="#f8c9a6" />
+        <path d="M74 139h76" stroke="#ffffff" strokeWidth="8" strokeLinecap="round" opacity="0.9" />
+        <path d="M88 158h48" stroke="#ffffff" strokeWidth="8" strokeLinecap="round" opacity="0.75" />
+      </svg>
+    </div>
+  );
+}
+
 function ResultSection({
   state,
   noParticipantsCompleted,
@@ -478,22 +635,62 @@ function ResultSection({
   viewerWon: boolean | null;
 }) {
   return (
-    <section className="mt-4 rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-200/80">
-      <Trophy className="text-amber-500" size={32} aria-hidden />
-      <h2 className="mt-3 text-xl font-black text-slate-950">추첨 결과</h2>
-      <p className="mt-3 text-base font-bold leading-7 text-slate-700">
-        {noParticipantsCompleted
-          ? "참여자 없음으로 마감되었습니다."
-          : viewerWon
-            ? "축하합니다. 배정되었습니다."
-            : "이번 의뢰는 다른 기사님께 배정되었습니다."}
-      </p>
+    <section className="result-celebration-card relative mt-4 overflow-hidden rounded-3xl bg-white p-5 shadow-card ring-1 ring-amber-100">
+      <div className="result-confetti" aria-hidden>
+        <span />
+        <span />
+        <span />
+        <span />
+        <span />
+        <span />
+        <span />
+        <span />
+      </div>
+
+      <div className="relative z-10 flex items-start justify-between gap-3">
+        <div>
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-xs font-black text-amber-800 ring-1 ring-amber-200">
+            <Trophy size={14} aria-hidden />
+            배차 확정
+          </span>
+          <h2 className="mt-3 text-2xl font-black text-slate-950">추첨 결과</h2>
+          <p className="mt-2 text-base font-bold leading-7 text-slate-700">
+            {noParticipantsCompleted
+              ? "참여자 없음으로 마감되었습니다."
+              : viewerWon
+                ? "축하합니다. 배정되었습니다."
+                : "이번 의뢰는 다른 기사님께 배정되었습니다."}
+          </p>
+        </div>
+        {!noParticipantsCompleted ? <TaxiDriverThumbsUp /> : null}
+      </div>
+
       {state.draw.winnerName ? (
-        <p className="mt-3 rounded-2xl bg-amber-50 px-3 py-3 text-base font-black text-amber-800 ring-1 ring-amber-100">
-          당첨자: {state.draw.winnerName}
-        </p>
-      ) : null}
-      <ResultCopyButton state={state} />
+        <div className="relative z-10 mt-5 rounded-3xl bg-gradient-to-br from-amber-100 via-yellow-50 to-amber-300 p-5 shadow-sm ring-1 ring-amber-200">
+          <div className="absolute right-4 top-4 h-20 w-20 rounded-full bg-white/45 blur-sm" aria-hidden />
+          <p className="relative text-sm font-black text-amber-900">당첨자 닉네임</p>
+          <p className="relative mt-2 break-words text-5xl font-black leading-none tracking-normal text-amber-950">
+            {state.draw.winnerName}
+          </p>
+          <p className="relative mt-3 text-sm font-black text-amber-800">
+            담당 기사님으로 배정되었습니다.
+          </p>
+        </div>
+      ) : (
+        <div className="relative z-10 mt-5 rounded-3xl bg-slate-50 p-5 ring-1 ring-slate-200">
+          <p className="text-2xl font-black text-slate-800">참여자 없음</p>
+          <p className="mt-2 text-sm font-bold text-slate-500">이번 의뢰는 당첨자 없이 마감되었습니다.</p>
+        </div>
+      )}
+
+      <div className="relative z-10 mt-4 rounded-2xl bg-slate-50 px-4 py-3 ring-1 ring-slate-100">
+        <p className="text-xs font-black text-slate-500">추첨 완료 시간</p>
+        <p className="mt-1 text-sm font-black text-slate-800">{formatDateTimeKo(state.draw.drawnAt)}</p>
+      </div>
+
+      <div className="relative z-10">
+        <ResultCopyButton state={state} />
+      </div>
     </section>
   );
 }

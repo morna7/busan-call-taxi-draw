@@ -53,6 +53,90 @@ select:focus-visible {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
+.result-celebration-card {
+  background:
+    radial-gradient(circle at 82% 6%, rgba(250, 204, 21, 0.28), transparent 9rem),
+    radial-gradient(circle at 8% 18%, rgba(59, 130, 246, 0.12), transparent 9rem),
+    linear-gradient(180deg, #ffffff 0%, #fffdf4 100%);
+}
+
+.result-driver-figure {
+  width: 112px;
+  height: 112px;
+  flex: 0 0 auto;
+  filter: drop-shadow(0 16px 22px rgba(15, 23, 42, 0.14));
+  animation: result-driver-wave 2.8s ease-in-out infinite;
+}
+
+.result-confetti {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.result-confetti span {
+  position: absolute;
+  top: -18px;
+  width: 10px;
+  height: 18px;
+  border-radius: 4px;
+  opacity: 0.9;
+  animation: result-confetti-fall 3.8s linear infinite;
+}
+
+.result-confetti span:nth-child(1) {
+  left: 9%;
+  background: #f59e0b;
+  animation-delay: -0.2s;
+}
+
+.result-confetti span:nth-child(2) {
+  left: 21%;
+  background: #60a5fa;
+  animation-delay: -1.7s;
+  animation-duration: 4.6s;
+}
+
+.result-confetti span:nth-child(3) {
+  left: 36%;
+  background: #22c55e;
+  animation-delay: -0.9s;
+}
+
+.result-confetti span:nth-child(4) {
+  left: 52%;
+  background: #facc15;
+  animation-delay: -2.3s;
+  animation-duration: 4.2s;
+}
+
+.result-confetti span:nth-child(5) {
+  left: 67%;
+  background: #fb7185;
+  animation-delay: -1.2s;
+}
+
+.result-confetti span:nth-child(6) {
+  left: 79%;
+  background: #38bdf8;
+  animation-delay: -2.8s;
+  animation-duration: 4.8s;
+}
+
+.result-confetti span:nth-child(7) {
+  left: 88%;
+  background: #f97316;
+  animation-delay: -0.6s;
+}
+
+.result-confetti span:nth-child(8) {
+  left: 44%;
+  background: #a78bfa;
+  animation-delay: -3.1s;
+  animation-duration: 5s;
+}
+
 .lottery-stage {
   position: relative;
   min-height: 280px;
@@ -292,11 +376,32 @@ select:focus-visible {
   }
 }
 
+@keyframes result-confetti-fall {
+  0% {
+    transform: translateY(-24px) rotate(0deg);
+  }
+  100% {
+    transform: translateY(520px) rotate(420deg);
+  }
+}
+
+@keyframes result-driver-wave {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-5px) rotate(1.5deg);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .lottery-drum.is-spinning,
   .lottery-ball,
   .winner-ball,
-  .winner-rays {
+  .winner-rays,
+  .result-confetti span,
+  .result-driver-figure {
     animation: none;
   }
 }
