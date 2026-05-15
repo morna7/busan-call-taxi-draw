@@ -109,17 +109,79 @@ function drawWrappedText(
   });
 }
 
-async function copyResultCanvasToClipboard(canvas: HTMLCanvasElement) {
+async function canvasToPngBlob(canvas: HTMLCanvasElement) {
   const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/png"));
   if (!blob) {
     throw new Error("결과 이미지를 만들지 못했습니다.");
   }
 
-  if (!("ClipboardItem" in window) || !navigator.clipboard?.write) {
-    throw new Error("이 브라우저에서는 이미지 복사를 지원하지 않습니다.");
+  return blob;
+}
+
+function isMobileLikeBrowser() {
+  return (
+    window.matchMedia("(pointer: coarse)").matches ||
+    /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+  );
+}
+
+function downloadResultImage(blob: Blob) {
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = "busan-call-taxi-draw-result.png";
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+async function shareResultImage(file: File) {
+  if (!navigator.share || !navigator.canShare?.({ files: [file] })) {
+    return false;
   }
 
-  await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+  await navigator.share({
+    title: "장거리전문부산콜택시 배차 추첨 결과",
+    text: "배차 추첨 결과 이미지입니다.",
+    files: [file]
+  });
+
+  return true;
+}
+
+async function copyResultCanvasToClipboard(canvas: HTMLCanvasElement) {
+  const blob = await canvasToPngBlob(canvas);
+  const file = new File([blob], "busan-call-taxi-draw-result.png", { type: "image/png" });
+
+  if (isMobileLikeBrowser()) {
+    const shared = await shareResultImage(file);
+    if (shared) {
+      return "공유창이 열렸습니다. 카카오톡을 선택해서 결과 이미지를 보낼 수 있습니다.";
+    }
+  }
+
+  if ("ClipboardItem" in window && navigator.clipboard?.write) {
+    try {
+      await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+      return "결과 이미지가 복사되었습니다. 카카오톡 등에 바로 붙여넣을 수 있습니다.";
+    } catch (error) {
+      if ((error as Error).name === "NotAllowedError" && isMobileLikeBrowser()) {
+        const shared = await shareResultImage(file);
+        if (shared) {
+          return "공유창이 열렸습니다. 카카오톡을 선택해서 결과 이미지를 보낼 수 있습니다.";
+        }
+      }
+    }
+  }
+
+  const shared = await shareResultImage(file);
+  if (shared) {
+    return "공유창이 열렸습니다. 카카오톡을 선택해서 결과 이미지를 보낼 수 있습니다.";
+  }
+
+  downloadResultImage(blob);
+  return "이미지 복사를 지원하지 않는 브라우저라 결과 이미지를 다운로드했습니다.";
 }
 
 function LotteryMachine({ state }: { state: PublicDrawState }) {
@@ -282,10 +344,16 @@ function ResultCopyButton({ state }: { state: PublicDrawState }) {
         drawWrappedText(context, state.draw.customerRequest, 108, 1180, 850, 36, 2);
       }
 
-      await copyResultCanvasToClipboard(canvas);
-      setMessage("결과 이미지가 복사되었습니다. 카카오톡 등에 바로 붙여넣을 수 있습니다.");
+      const resultMessage = await copyResultCanvasToClipboard(canvas);
+      setMessage(resultMessage);
     } catch (caught) {
-      setMessage(caught instanceof Error ? caught.message : "결과 이미지 복사에 실패했습니다.");
+      setMessage(
+        caught instanceof Error && caught.name === "AbortError"
+          ? "이미지 공유를 취소했습니다."
+          : caught instanceof Error
+            ? caught.message
+            : "결과 이미지 복사에 실패했습니다."
+      );
     } finally {
       setCopying(false);
     }
@@ -300,7 +368,7 @@ function ResultCopyButton({ state }: { state: PublicDrawState }) {
         className="flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-slate-950 px-4 py-3 text-base font-black text-white shadow-sm transition hover:bg-slate-800 disabled:bg-slate-300"
       >
         <Camera size={19} aria-hidden />
-        {copying ? "이미지 복사 중" : "추첨 결과 이미지 복사"}
+        {copying ? "이미지 준비 중" : "추첨 결과 이미지 복사/공유"}
       </button>
       {message ? (
         <p className="mt-2 rounded-2xl bg-slate-50 px-3 py-2 text-sm font-bold leading-5 text-slate-600">
