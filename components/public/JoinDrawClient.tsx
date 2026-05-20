@@ -15,6 +15,7 @@ import {
   Camera,
   CheckCircle2,
   Clock3,
+  ExternalLink,
   MapPin,
   Trophy,
   Users,
@@ -1144,6 +1145,26 @@ export function JoinDrawClient({ publicCode }: { publicCode: string }) {
         ) : null}
 
         <LotteryMachine state={state} />
+
+        <a
+          href="https://busantaxi.pages.dev/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-4 block overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-brand-900 to-brand-700 p-5 text-white shadow-lift ring-1 ring-blue-200/40 transition hover:-translate-y-0.5 hover:shadow-card"
+        >
+          <div className="flex items-center justify-between gap-4">
+            <div className="min-w-0">
+              <p className="text-xs font-black text-blue-200">장거리전문부산콜택시</p>
+              <p className="mt-1 text-lg font-black leading-snug">공식 홈페이지 바로가기</p>
+              <p className="mt-2 text-sm font-semibold leading-5 text-blue-100">
+                장거리 콜택시 안내와 상담 정보를 확인하세요.
+              </p>
+            </div>
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/12 ring-1 ring-white/20">
+              <ExternalLink size={22} aria-hidden />
+            </span>
+          </div>
+        </a>
       </div>
 
       {!viewer && !completed && state.draw.status !== "cancelled" ? (
