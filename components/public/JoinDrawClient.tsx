@@ -1002,8 +1002,6 @@ export function JoinDrawClient({ publicCode }: { publicCode: string }) {
           </div>
         </section>
 
-        <LotteryMachine state={state} />
-
         {viewer ? (
           <section className="mt-4 rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-200/80">
             <CheckCircle2 className="text-emerald-600" size={30} aria-hidden />
@@ -1097,6 +1095,8 @@ export function JoinDrawClient({ publicCode }: { publicCode: string }) {
             {notice ? <p className="mt-3 text-sm font-bold text-emerald-700">{notice}</p> : null}
           </form>
         ) : null}
+
+        <LotteryMachine state={state} />
       </div>
 
       {!viewer && !completed && state.draw.status !== "cancelled" ? (

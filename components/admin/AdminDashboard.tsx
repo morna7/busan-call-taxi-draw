@@ -267,6 +267,13 @@ export function AdminDashboard({ initialData }: { initialData: DashboardData }) 
                         재투표 실시
                       </button>
                     ) : null}
+                    <Link
+                      href={`/admin/draws/new?copyFrom=${encodeURIComponent(draw.id)}`}
+                      className="mt-2 inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-blue-50 px-3 text-sm font-black text-brand-700 ring-1 ring-blue-100 transition hover:bg-blue-100"
+                    >
+                      <Copy size={16} aria-hidden />
+                      재등록
+                    </Link>
 
                     <div className="mt-4 grid grid-cols-[1fr_1fr_2.9rem] gap-2">
                       <button

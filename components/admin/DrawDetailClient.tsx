@@ -448,6 +448,13 @@ export function DrawDetailClient({ initialData }: { initialData: DetailData }) {
                   재투표 실시
                 </PrimaryButton>
               ) : null}
+              <Link
+                href={`/admin/draws/new?copyFrom=${encodeURIComponent(draw.id)}`}
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-blue-50 px-4 py-3 text-base font-black text-brand-700 shadow-sm ring-1 ring-blue-100 transition hover:bg-blue-100 active:scale-[0.99]"
+              >
+                <Copy size={18} aria-hidden />
+                재등록
+              </Link>
               <PrimaryButton
                 type="button"
                 tone="danger"

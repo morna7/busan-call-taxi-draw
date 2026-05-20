@@ -19,14 +19,16 @@ type FormState = {
   startAt: string;
 };
 
+export type DrawFormInitialValues = Partial<FormState>;
+
 function getCurrentDateTimeLocalValue() {
   const now = new Date();
   const offsetMs = now.getTimezoneOffset() * 60 * 1000;
   return new Date(now.getTime() - offsetMs).toISOString().slice(0, 16);
 }
 
-function createInitialState(): FormState {
-  return {
+function createInitialState(initialValues?: DrawFormInitialValues): FormState {
+  const base: FormState = {
     title: "",
     origin: "",
     destination: "",
@@ -38,11 +40,25 @@ function createInitialState(): FormState {
     startMode: "now",
     startAt: getCurrentDateTimeLocalValue()
   };
+
+  return {
+    ...base,
+    ...initialValues,
+    durationSeconds: initialValues?.durationSeconds ?? base.durationSeconds,
+    startMode: initialValues?.startMode ?? base.startMode,
+    startAt: initialValues?.startAt ?? base.startAt
+  };
 }
 
-export function DrawForm() {
+export function DrawForm({
+  initialValues,
+  submitLabel = "의뢰 등록"
+}: {
+  initialValues?: DrawFormInitialValues;
+  submitLabel?: string;
+}) {
   const router = useRouter();
-  const [form, setForm] = useState<FormState>(() => createInitialState());
+  const [form, setForm] = useState<FormState>(() => createInitialState(initialValues));
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -232,7 +248,7 @@ export function DrawForm() {
       <div className="safe-bottom sticky bottom-0 -mx-4 border-t border-slate-200 bg-slate-50/95 px-4 py-3 backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0">
         <PrimaryButton type="submit" className="w-full" disabled={submitting}>
           <Save size={20} aria-hidden />
-          {submitting ? "등록 중" : "의뢰 등록"}
+          {submitting ? "등록 중" : submitLabel}
         </PrimaryButton>
       </div>
     </form>
