@@ -261,7 +261,10 @@ export function DrawDetailClient({ initialData }: { initialData: DetailData }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...edit,
+          origin: edit.title.trim(),
+          destination: "",
           departureTime: edit.departureTime.trim() || null,
+          adminMemo: null,
           startAt: toIsoOrNull(edit.startAt),
           startMode: "scheduled"
         })
@@ -300,9 +303,11 @@ export function DrawDetailClient({ initialData }: { initialData: DetailData }) {
             <span className="text-sm font-bold text-slate-500">코드 {draw.publicCode}</span>
           </div>
           <h1 className="mt-2 text-2xl font-black leading-tight text-slate-950">{draw.title}</h1>
-          <p className="mt-1 text-base font-semibold text-slate-600">
-            {draw.origin} → {draw.destination}
-          </p>
+          {draw.destination ? (
+            <p className="mt-1 text-base font-semibold text-slate-600">
+              {draw.origin} → {draw.destination}
+            </p>
+          ) : null}
         </div>
         <div className="flex flex-wrap gap-2">
           <PrimaryButton type="button" tone="secondary" onClick={() => refresh()} className="px-3">
@@ -473,20 +478,14 @@ export function DrawDetailClient({ initialData }: { initialData: DetailData }) {
         <form onSubmit={saveEdit} className="mt-4 rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-200/80">
           <h2 className="text-lg font-black text-slate-950">시작 전 의뢰 수정</h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
-            <Field label="의뢰 제목">
+            <Field label="의뢰 내용">
               <TextInput value={edit.title} onChange={(event) => setEdit({ ...edit, title: event.target.value })} />
             </Field>
             <Field label="참여 시작 시간">
               <TextInput type="datetime-local" value={edit.startAt} onChange={(event) => setEdit({ ...edit, startAt: event.target.value })} />
             </Field>
-            <Field label="출발지">
-              <TextInput value={edit.origin} onChange={(event) => setEdit({ ...edit, origin: event.target.value })} />
-            </Field>
-            <Field label="도착지">
-              <TextInput value={edit.destination} onChange={(event) => setEdit({ ...edit, destination: event.target.value })} />
-            </Field>
             <Field label="출발 예정 시간">
-              <TextInput value={edit.departureTime} onChange={(event) => setEdit({ ...edit, departureTime: event.target.value })} placeholder="예: 오늘 오후 3시, 2026-05-14 15:00" />
+              <TextInput value={edit.departureTime} onChange={(event) => setEdit({ ...edit, departureTime: event.target.value })} placeholder="선택" />
             </Field>
             <Field label="참여 제한 시간(초)">
               <TextInput type="number" min={30} max={3600} step={30} value={edit.durationSeconds} onChange={(event) => setEdit({ ...edit, durationSeconds: Number(event.target.value) })} />
@@ -495,9 +494,6 @@ export function DrawDetailClient({ initialData }: { initialData: DetailData }) {
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <Field label="요금">
               <TextInput value={edit.estimatedFare} onChange={(event) => setEdit({ ...edit, estimatedFare: event.target.value })} />
-            </Field>
-            <Field label="관리자 메모">
-              <TextArea value={edit.adminMemo} onChange={(event) => setEdit({ ...edit, adminMemo: event.target.value })} />
             </Field>
           </div>
           <div className="mt-4">

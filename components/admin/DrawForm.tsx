@@ -81,12 +81,17 @@ export function DrawForm({
         }
       }
 
+      const requestText = form.title.trim();
       const response = await fetch("/api/admin/draws", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...form,
+          title: requestText,
+          origin: requestText,
+          destination: "",
           departureTime: form.departureTime.trim() || null,
+          adminMemo: null,
           startAt: scheduledStartAt ? scheduledStartAt.toISOString() : null
         })
       });
@@ -125,38 +130,19 @@ export function DrawForm({
         </div>
 
         <div className="mt-5 space-y-4">
-          <Field label="의뢰 제목">
+          <Field label="의뢰 내용">
             <TextInput
               value={form.title}
               onChange={(event) => update("title", event.target.value)}
-              placeholder="예: 부산 → 서울 장거리 콜"
+              placeholder="예: 부산역에서 경주 11일 17시"
               required
             />
           </Field>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="출발지">
-              <TextInput
-                value={form.origin}
-                onChange={(event) => update("origin", event.target.value)}
-                placeholder="부산 ○○구"
-                required
-              />
-            </Field>
-            <Field label="도착지">
-              <TextInput
-                value={form.destination}
-                onChange={(event) => update("destination", event.target.value)}
-                placeholder="서울 ○○구"
-                required
-              />
-            </Field>
-          </div>
           <Field label="출발 예정 시간">
             <TextInput
               value={form.departureTime}
               onChange={(event) => update("departureTime", event.target.value)}
-              placeholder="예: 오늘 오후 3시, 2026-05-14 15:00"
-              required
+              placeholder="선택"
             />
           </Field>
           <Field label="요금" hint="선택 입력입니다. 예: 35만원">
@@ -170,13 +156,6 @@ export function DrawForm({
             <TextArea
               value={form.customerRequest}
               onChange={(event) => update("customerRequest", event.target.value)}
-              placeholder="선택"
-            />
-          </Field>
-          <Field label="관리자 메모" hint="참여자 화면에는 보이지 않습니다.">
-            <TextArea
-              value={form.adminMemo}
-              onChange={(event) => update("adminMemo", event.target.value)}
               placeholder="선택"
             />
           </Field>

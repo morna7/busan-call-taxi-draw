@@ -1012,12 +1012,14 @@ export function JoinDrawClient({ publicCode }: { publicCode: string }) {
         <section className="mt-4 rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-200/80">
           <h2 className="text-xl font-black leading-snug text-slate-950">{state.draw.title}</h2>
           <div className="mt-4 space-y-3 text-base text-slate-700">
-            <div className="flex gap-2">
-              <MapPin className="mt-0.5 shrink-0 text-brand-600" size={20} aria-hidden />
-              <p className="min-w-0 font-bold">
-                {state.draw.origin} <span className="text-slate-400">→</span> {state.draw.destination}
-              </p>
-            </div>
+            {state.draw.destination ? (
+              <div className="flex gap-2">
+                <MapPin className="mt-0.5 shrink-0 text-brand-600" size={20} aria-hidden />
+                <p className="min-w-0 font-bold">
+                  {state.draw.origin} <span className="text-slate-400">→</span> {state.draw.destination}
+                </p>
+              </div>
+            ) : null}
             <div className="flex gap-2">
               <Clock3 className="mt-0.5 shrink-0 text-brand-600" size={20} aria-hidden />
               <p>출발 예정: {formatPlainText(state.draw.departureTime)}</p>

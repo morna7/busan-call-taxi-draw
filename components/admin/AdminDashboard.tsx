@@ -223,9 +223,11 @@ export function AdminDashboard({ initialData }: { initialData: DashboardData }) 
                         <h3 className="line-clamp-2 text-lg font-black leading-snug text-slate-950">
                           {draw.title}
                         </h3>
-                        <p className="mt-1 truncate text-sm font-semibold text-slate-600">
-                          {draw.origin} → {draw.destination}
-                        </p>
+                        {draw.destination ? (
+                          <p className="mt-1 truncate text-sm font-semibold text-slate-600">
+                            {draw.origin} → {draw.destination}
+                          </p>
+                        ) : null}
                       </Link>
                       <StatusBadge status={draw.status} />
                     </div>

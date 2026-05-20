@@ -71,22 +71,14 @@ export function validateDrawInput(input: DrawInput): {
   code: string;
 } {
   const title = normalizeOptionalText(input.title);
-  const origin = normalizeOptionalText(input.origin);
-  const destination = normalizeOptionalText(input.destination);
+  const originInput = normalizeOptionalText(input.origin);
+  const destinationInput = normalizeOptionalText(input.destination);
   const durationSeconds = Number(input.durationSeconds ?? 180);
   const startMode = input.startMode ?? "now";
   const startAt = normalizeOptionalText(input.startAt);
 
   if (!title) {
-    return { ok: false, message: "의뢰 제목을 입력해 주세요.", code: "title_required" };
-  }
-
-  if (!origin) {
-    return { ok: false, message: "출발지를 입력해 주세요.", code: "origin_required" };
-  }
-
-  if (!destination) {
-    return { ok: false, message: "도착지를 입력해 주세요.", code: "destination_required" };
+    return { ok: false, message: "의뢰 내용을 입력해 주세요.", code: "title_required" };
   }
 
   if (!Number.isFinite(durationSeconds) || durationSeconds < 30 || durationSeconds > 3600) {
@@ -117,8 +109,8 @@ export function validateDrawInput(input: DrawInput): {
     ok: true,
     value: {
       title,
-      origin,
-      destination,
+      origin: originInput ?? title,
+      destination: destinationInput ?? "",
       departureTime: normalizeOptionalText(input.departureTime),
       estimatedFare: normalizeOptionalText(input.estimatedFare),
       customerRequest: normalizeOptionalText(input.customerRequest),
