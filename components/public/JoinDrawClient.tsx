@@ -17,7 +17,8 @@ import {
   Clock3,
   MapPin,
   Trophy,
-  Users
+  Users,
+  XCircle
 } from "lucide-react";
 import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
 import { formatCountdown, formatDateTimeKo, formatPlainText } from "@/lib/time";
@@ -700,6 +701,7 @@ export function JoinDrawClient({ publicCode }: { publicCode: string }) {
   const [vehicleLast4, setVehicleLast4] = useState("");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [canceling, setCanceling] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const finalizingRef = useRef(false);
@@ -867,6 +869,43 @@ export function JoinDrawClient({ publicCode }: { publicCode: string }) {
     }
   }
 
+  async function cancelParticipation() {
+    const participantId = readStoredParticipantId(publicCode);
+    if (!participantId || !state?.viewerParticipant) {
+      setError("취소할 참여 내역을 찾지 못했습니다.");
+      return;
+    }
+
+    if (!window.confirm("참여를 취소할까요?\n\n취소 후에는 참여 시간 안에 다시 참여할 수 있습니다.")) {
+      return;
+    }
+
+    setCanceling(true);
+    setError(null);
+    setNotice(null);
+
+    try {
+      const response = await fetch(`/api/public/draw/${publicCode}/cancel`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ participantId })
+      });
+      const payload = (await response.json()) as ApiResponse;
+
+      if (!response.ok || !payload.ok || !payload.data) {
+        throw new Error(payload.message || "참여 취소에 실패했습니다.");
+      }
+
+      window.localStorage.removeItem(storageKey(publicCode));
+      setState(payload.data);
+      setNotice(payload.message ?? "참여가 취소되었습니다.");
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "참여 취소 중 오류가 발생했습니다.");
+    } finally {
+      setCanceling(false);
+    }
+  }
+
   if (loading) {
     return (
       <main className="flex min-h-dvh items-center justify-center px-4">
@@ -893,6 +932,7 @@ export function JoinDrawClient({ publicCode }: { publicCode: string }) {
 
   const viewer = state.viewerParticipant;
   const completed = state.draw.status === "completed";
+  const canCancelParticipation = Boolean(viewer) && state.draw.status === "open" && remaining > 0;
   const noParticipantsCompleted = completed && !state.draw.winnerName;
   const viewerWon = completed && viewer && viewer.id === state.draw.winnerParticipantId;
   const isScheduled = state.draw.status === "scheduled";
@@ -983,6 +1023,18 @@ export function JoinDrawClient({ publicCode }: { publicCode: string }) {
                 추첨 결과를 기다리고 있습니다. 화면을 닫아도 같은 브라우저에서는 접수 내역이 유지됩니다.
               </p>
             ) : null}
+            {canCancelParticipation ? (
+              <button
+                type="button"
+                onClick={cancelParticipation}
+                disabled={canceling}
+                className="mt-3 flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-rose-50 px-4 py-3 text-base font-black text-rose-700 ring-1 ring-rose-200 transition hover:bg-rose-100 disabled:bg-slate-100 disabled:text-slate-400 disabled:ring-slate-200"
+              >
+                <XCircle size={19} aria-hidden />
+                {canceling ? "참여 취소 중" : "참여 취소하기"}
+              </button>
+            ) : null}
+            {error ? <p className="mt-3 text-sm font-bold text-rose-700">{error}</p> : null}
           </section>
         ) : null}
 

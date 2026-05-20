@@ -18,6 +18,7 @@ import {
   Edit3,
   ExternalLink,
   RefreshCw,
+  RotateCcw,
   Save,
   Trophy,
   Users
@@ -224,6 +225,31 @@ export function DrawDetailClient({ initialData }: { initialData: DetailData }) {
     flash(payload.message || "추첨 상태를 확인했습니다.");
   }
 
+  async function rerunDraw() {
+    const confirmed = window.confirm(
+      `"${draw.title}" 의뢰를 같은 정보로 다시 투표 시작할까요?\n\n기존 완료 기록은 그대로 남고, 새 참여 링크가 만들어집니다.`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setError(null);
+    const response = await fetch(`/api/admin/draws/${draw.id}/rerun`, { method: "POST" });
+    const payload = (await response.json()) as {
+      ok: boolean;
+      data?: { id: string };
+      message?: string;
+    };
+
+    if (!response.ok || !payload.ok || !payload.data) {
+      setError(payload.message || "재투표를 시작하지 못했습니다.");
+      return;
+    }
+
+    window.location.assign(`/admin/draws/${payload.data.id}`);
+  }
+
   async function saveEdit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSaving(true);
@@ -416,6 +442,12 @@ export function DrawDetailClient({ initialData }: { initialData: DetailData }) {
                 <Copy size={18} aria-hidden />
                 결과 복사
               </PrimaryButton>
+              {draw.status === "completed" && draw.participants.length === 0 && !draw.winnerParticipantId ? (
+                <PrimaryButton type="button" tone="secondary" onClick={rerunDraw}>
+                  <RotateCcw size={18} aria-hidden />
+                  재투표 실시
+                </PrimaryButton>
+              ) : null}
               <PrimaryButton
                 type="button"
                 tone="danger"

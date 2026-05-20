@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { Copy, ExternalLink, Plus, RefreshCw, Trash2, Users } from "lucide-react";
+import { Copy, ExternalLink, Plus, RefreshCw, RotateCcw, Trash2, Users } from "lucide-react";
 import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
 import { formatCountdown, formatDateTimeKo, formatPlainText } from "@/lib/time";
 import type { AdminDrawSummary, DrawStatus } from "@/lib/types";
@@ -142,6 +142,35 @@ export function AdminDashboard({ initialData }: { initialData: DashboardData }) 
     window.setTimeout(() => setMessage(null), 1800);
   }
 
+  async function rerunDraw(draw: AdminDrawSummary) {
+    const confirmed = window.confirm(
+      `"${draw.title}" 의뢰를 같은 정보로 다시 투표 시작할까요?\n\n기존 완료 기록은 그대로 남고, 새 참여 링크가 만들어집니다.`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    const response = await fetch(`/api/admin/draws/${draw.id}/rerun`, {
+      method: "POST"
+    });
+    const payload = (await response.json()) as {
+      ok: boolean;
+      data?: { id: string };
+      message?: string;
+    };
+
+    if (!response.ok || !payload.ok || !payload.data) {
+      setMessage(payload.message || "재투표를 시작하지 못했습니다.");
+      window.setTimeout(() => setMessage(null), 2400);
+      return;
+    }
+
+    setMessage("동일한 의뢰로 재투표를 시작했습니다.");
+    await refresh();
+    window.setTimeout(() => setMessage(null), 1800);
+  }
+
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-5 sm:py-7">
       <div className="flex flex-col gap-4 rounded-3xl bg-gradient-to-br from-white via-blue-50 to-slate-100 p-5 shadow-card ring-1 ring-slate-200/80 sm:flex-row sm:items-end sm:justify-between sm:p-6">
@@ -227,6 +256,17 @@ export function AdminDashboard({ initialData }: { initialData: DashboardData }) 
                         {draw.participantCount}명
                       </span>
                     </div>
+
+                    {draw.status === "completed" && draw.participantCount === 0 && !draw.winnerName ? (
+                      <button
+                        type="button"
+                        onClick={() => rerunDraw(draw)}
+                        className="mt-3 inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-amber-50 px-3 text-sm font-black text-amber-800 ring-1 ring-amber-200 transition hover:bg-amber-100"
+                      >
+                        <RotateCcw size={16} aria-hidden />
+                        재투표 실시
+                      </button>
+                    ) : null}
 
                     <div className="mt-4 grid grid-cols-[1fr_1fr_2.9rem] gap-2">
                       <button
