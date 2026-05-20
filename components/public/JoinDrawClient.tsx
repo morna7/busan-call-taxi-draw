@@ -965,6 +965,49 @@ export function JoinDrawClient({ publicCode }: { publicCode: string }) {
         </div>
         </div>
 
+        {!viewer && !completed && state.draw.status !== "cancelled" ? (
+          <form onSubmit={onSubmit} className="mt-4 rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-200/80">
+            <label className="block">
+              <span className="mb-1.5 block text-sm font-black text-slate-800">닉네임</span>
+              <input
+                value={nickname}
+                onChange={(event) => setNickname(event.target.value)}
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3.5 text-base font-semibold focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-100"
+                placeholder="사용할 닉네임"
+                autoComplete="nickname"
+                disabled={!canJoin || submitting}
+              />
+            </label>
+            <label className="mt-3 block">
+              <span className="mb-1.5 block text-sm font-black text-slate-800">
+                차량번호 뒤 4자리 <span className="font-semibold text-slate-500">선택</span>
+              </span>
+              <input
+                value={vehicleLast4}
+                onChange={(event) => setVehicleLast4(event.target.value.replace(/\D/g, "").slice(0, 4))}
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3.5 text-base font-semibold focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-100"
+                placeholder="예: 1234"
+                inputMode="numeric"
+                maxLength={4}
+                disabled={!canJoin || submitting}
+              />
+              <span className="mt-1 block text-xs leading-5 text-slate-500">
+                같은 닉네임 구분을 위해 가능하면 입력해 주세요.
+              </span>
+            </label>
+            {state.draw.customerRequest ? (
+              <section className="mt-4 rounded-2xl bg-blue-50 px-4 py-3 ring-1 ring-blue-100">
+                <h3 className="text-sm font-black text-brand-700">고객 요청사항</h3>
+                <p className="mt-2 whitespace-pre-wrap text-sm font-semibold leading-6 text-slate-700">
+                  {state.draw.customerRequest}
+                </p>
+              </section>
+            ) : null}
+            {error ? <p className="mt-3 text-sm font-bold text-rose-700">{error}</p> : null}
+            {notice ? <p className="mt-3 text-sm font-bold text-emerald-700">{notice}</p> : null}
+          </form>
+        ) : null}
+
         <section className="mt-4 rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-200/80">
           <h2 className="text-xl font-black leading-snug text-slate-950">{state.draw.title}</h2>
           <div className="mt-4 space-y-3 text-base text-slate-700">
@@ -1053,7 +1096,11 @@ export function JoinDrawClient({ publicCode }: { publicCode: string }) {
           </section>
         ) : null}
 
-        {!viewer && !completed && state.draw.status !== "cancelled" ? (
+        {state !== null &&
+        state.draw.id === "__legacy_join_form_slot__" &&
+        !viewer &&
+        !completed &&
+        state.draw.status !== "cancelled" ? (
           <form onSubmit={onSubmit} className="mt-4 rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-200/80">
             <label className="block">
               <span className="mb-1.5 block text-sm font-black text-slate-800">닉네임</span>
