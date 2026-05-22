@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CarTaxiFront, Plus } from "lucide-react";
+import { CarTaxiFront, Plus, Trophy } from "lucide-react";
 import { LogoutButton } from "@/components/admin/LogoutButton";
 
 export function AdminTopBar() {
@@ -20,6 +20,15 @@ export function AdminTopBar() {
           </span>
         </Link>
         <div className="flex shrink-0 items-center gap-2">
+          <Link
+            href="/admin/winners"
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-amber-50 px-3 text-sm font-black text-amber-800 ring-1 ring-amber-200 transition hover:bg-amber-100"
+            aria-label="명예의 전당"
+            title="명예의 전당"
+          >
+            <Trophy size={18} aria-hidden />
+            <span className="hidden sm:inline">명예의 전당</span>
+          </Link>
           <Link
             href="/admin/draws/new"
             className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-b from-brand-600 to-brand-700 text-white shadow-lift transition hover:from-brand-500 hover:to-brand-700"

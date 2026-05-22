@@ -2,6 +2,14 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { openDrawIfNeeded, toAdminDrawDetail, toAdminDrawSummary } from "@/lib/draw-service";
 import type { AdminDrawDetail, AdminDrawSummary, AuditLogRow, DrawRow, ParticipantRow } from "@/lib/types";
 
+export type WinnerRanking = {
+  rank: number;
+  name: string;
+  phoneLast4: string | null;
+  winCount: number;
+  latestWonAt: string | null;
+};
+
 export async function loadAdminDrawSummaries(client: SupabaseClient): Promise<{
   serverNow: string;
   draws: AdminDrawSummary[];
@@ -95,5 +103,82 @@ export async function loadAdminDrawDetail(
       participants: (participantsResult.data as ParticipantRow[]) ?? [],
       auditLogs: (auditResult.data as AuditLogRow[]) ?? []
     })
+  };
+}
+
+export async function loadWinnerRankings(client: SupabaseClient): Promise<{
+  serverNow: string;
+  totalWins: number;
+  rankings: WinnerRanking[];
+}> {
+  const now = new Date();
+  const { data, error } = await client
+    .from("participants")
+    .select("id, name, phone_last4, joined_at, is_winner")
+    .eq("is_winner", true)
+    .order("joined_at", { ascending: false });
+
+  if (error) {
+    throw error;
+  }
+
+  const grouped = new Map<
+    string,
+    {
+      name: string;
+      phoneLast4: string | null;
+      winCount: number;
+      latestWonAt: string | null;
+    }
+  >();
+
+  for (const participant of ((data as ParticipantRow[]) ?? [])) {
+    const normalizedName = participant.name.trim().toLocaleLowerCase("ko-KR");
+    const phoneLast4 = participant.phone_last4 ?? "";
+    const key = `${normalizedName}::${phoneLast4}`;
+    const existing = grouped.get(key);
+
+    if (!existing) {
+      grouped.set(key, {
+        name: participant.name,
+        phoneLast4: participant.phone_last4,
+        winCount: 1,
+        latestWonAt: participant.joined_at
+      });
+      continue;
+    }
+
+    existing.winCount += 1;
+    if (
+      !existing.latestWonAt ||
+      new Date(participant.joined_at).getTime() > new Date(existing.latestWonAt).getTime()
+    ) {
+      existing.latestWonAt = participant.joined_at;
+    }
+  }
+
+  const rankings = Array.from(grouped.values())
+    .sort((left, right) => {
+      if (right.winCount !== left.winCount) {
+        return right.winCount - left.winCount;
+      }
+
+      const latestDiff =
+        new Date(right.latestWonAt ?? 0).getTime() - new Date(left.latestWonAt ?? 0).getTime();
+      if (latestDiff !== 0) {
+        return latestDiff;
+      }
+
+      return left.name.localeCompare(right.name, "ko-KR");
+    })
+    .map((winner, index) => ({
+      rank: index + 1,
+      ...winner
+    }));
+
+  return {
+    serverNow: now.toISOString(),
+    totalWins: ((data as ParticipantRow[]) ?? []).length,
+    rankings
   };
 }
