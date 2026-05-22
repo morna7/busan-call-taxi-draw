@@ -991,11 +991,12 @@ export function JoinDrawClient({ publicCode }: { publicCode: string }) {
                 placeholder="사용할 닉네임"
                 autoComplete="nickname"
                 disabled={!canJoin || submitting}
+                required
               />
             </label>
             <label className="mt-3 block">
               <span className="mb-1.5 block text-sm font-black text-slate-800">
-                차량번호 뒤 4자리 <span className="font-semibold text-slate-500">선택</span>
+                차량번호 뒤 4자리
               </span>
               <input
                 value={vehicleLast4}
@@ -1005,9 +1006,10 @@ export function JoinDrawClient({ publicCode }: { publicCode: string }) {
                 inputMode="numeric"
                 maxLength={4}
                 disabled={!canJoin || submitting}
+                required
               />
               <span className="mt-1 block text-xs leading-5 text-slate-500">
-                같은 닉네임 구분을 위해 가능하면 입력해 주세요.
+                참여하려면 차량번호 뒤 4자리를 반드시 입력해 주세요.
               </span>
             </label>
             {state.draw.customerRequest ? (
@@ -1128,11 +1130,12 @@ export function JoinDrawClient({ publicCode }: { publicCode: string }) {
                 placeholder="사용할 닉네임"
                 autoComplete="nickname"
                 disabled={!canJoin || submitting}
+                required
               />
             </label>
             <label className="mt-3 block">
               <span className="mb-1.5 block text-sm font-black text-slate-800">
-                차량번호 뒤 4자리 <span className="font-semibold text-slate-500">선택</span>
+                차량번호 뒤 4자리
               </span>
               <input
                 value={vehicleLast4}
@@ -1142,9 +1145,10 @@ export function JoinDrawClient({ publicCode }: { publicCode: string }) {
                 inputMode="numeric"
                 maxLength={4}
                 disabled={!canJoin || submitting}
+                required
               />
               <span className="mt-1 block text-xs leading-5 text-slate-500">
-                같은 닉네임 구분을 위해 가능하면 입력해 주세요.
+                참여하려면 차량번호 뒤 4자리를 반드시 입력해 주세요.
               </span>
             </label>
             {state.draw.customerRequest ? (

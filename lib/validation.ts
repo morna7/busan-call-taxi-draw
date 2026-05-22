@@ -32,7 +32,7 @@ export function normalizePhoneLast4(value: unknown): string | null {
 
 export function validateParticipantInput(input: ParticipantInput): {
   ok: true;
-  value: Required<ParticipantInput> & { phoneLast4: string | null };
+  value: Required<ParticipantInput> & { phoneLast4: string };
 } | {
   ok: false;
   message: string;
@@ -45,7 +45,15 @@ export function validateParticipantInput(input: ParticipantInput): {
     return { ok: false, message: "닉네임을 입력해 주세요.", code: "name_required" };
   }
 
-  if (phoneLast4 && !/^\d{4}$/.test(phoneLast4)) {
+  if (!phoneLast4) {
+    return {
+      ok: false,
+      message: "차량번호 뒤 4자리를 입력해 주세요.",
+      code: "phone_last4_required"
+    };
+  }
+
+  if (!/^\d{4}$/.test(phoneLast4)) {
     return {
       ok: false,
       message: "차량번호 뒤 4자리는 숫자 4자리로 입력해 주세요.",
