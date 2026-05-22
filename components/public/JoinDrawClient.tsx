@@ -9,6 +9,7 @@ import {
   useRef,
   useState
 } from "react";
+import Link from "next/link";
 import {
   AlertCircle,
   Banknote,
@@ -965,6 +966,19 @@ export function JoinDrawClient({ publicCode }: { publicCode: string }) {
           <StatusBadge status={state.draw.status} />
         </div>
         </div>
+
+        <nav className="mt-3 grid grid-cols-2 gap-2 rounded-2xl bg-white p-1.5 shadow-sm ring-1 ring-slate-200/80">
+          <span className="inline-flex min-h-11 items-center justify-center rounded-xl bg-brand-600 px-3 text-sm font-black text-white shadow-sm">
+            추첨 참여
+          </span>
+          <Link
+            href="/winners"
+            className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl px-3 text-sm font-black text-amber-800 transition hover:bg-amber-50"
+          >
+            <Trophy size={16} aria-hidden />
+            명예의 전당
+          </Link>
+        </nav>
 
         {!viewer && !completed && state.draw.status !== "cancelled" ? (
           <form onSubmit={onSubmit} className="mt-4 rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-200/80">
